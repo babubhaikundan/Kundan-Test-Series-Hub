@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundan Test Series Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4318FF; --secondary-color: #6A11CB;
+            --gradient-bg: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --background-color: #f4f7fe; --card-bg-color: rgba(255, 255, 255, 0.95);
+            --text-color: #2B3674; --light-text-color: #A3AED0;
+            --success-color: #05CD99; --border-color: #E0E5F2;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--background-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 50px; height: 50px; border-radius: 50%;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--background-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23E0E5F2' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color); opacity: 0; transition: opacity 0.5s ease-in-out;
+        }
+        body.loaded { opacity: 1; }
+        .container { max-width: 900px; margin: 0 auto; padding: 80px 20px 20px 20px; }
+        .hidden { display: none !important; }
+        .app-header {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 15px 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: fixed; top: 0; left:0; right:0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .app-header h1 { margin: 0; font-size: 1.6em; font-weight: 700; color: var(--primary-color); }
+        .telegram-btn {
+            display: flex; align-items: center; gap: 8px; background: #2AABEE; color: white;
+            padding: 8px 15px; border-radius: 50px; text-decoration: none; font-weight: 500;
+            font-size: 0.9em; transition: transform 0.2s; white-space: nowrap;
+        }
+        .telegram-btn:hover { transform: scale(1.05); }
+        .search-wrapper { position: relative; margin-bottom: 25px; }
+        .search-icon { position: absolute; top: 50%; left: 18px; transform: translateY(-50%); color: var(--light-text-color); }
+        .search-input {
+            width: 100%; padding: 15px 20px 15px 50px; border: 1px solid var(--border-color);
+            border-radius: 10px; font-size: 1em; box-sizing: border-box; transition: all 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(67, 24, 255, 0.1); }
+        .view {
+            background: var(--card-bg-color); border: 1px solid var(--border-color);
+            border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease-out;
+        }
+        .view-heading { font-size: 2em; font-weight: 600; color: var(--text-color); margin: 0 0 25px 0; text-align: center; }
+        .view-subheading { font-size: 1.3em; font-weight: 500; color: var(--light-text-color); margin: -15px 0 25px 0; text-align: center; }
+        .back-btn {
+            background: #f0f2f5; color: var(--primary-color); border: 2px solid var(--primary-color);
+            padding: 8px 20px; border-radius: 50px; cursor: pointer; font-size: 0.9em;
+            font-weight: 600; margin-bottom: 25px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .back-btn:hover { background: var(--gradient-bg); color: white; border-color: var(--primary-color); }
+        .card-list { display: grid; gap: 12px; padding: 0; list-style: none; margin: 0; }
+        .card-list-item {
+            background-color: #fff; border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 20px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            opacity: 0; animation: slideInUp 0.5s ease-out forwards;
+        }
+        .card-list-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-color: var(--primary-color); }
+        .card-list-item-content { display: flex; align-items: center; gap: 15px; }
+        .card-list-item-icon { color: var(--primary-color); }
+        .card-list-item h3 { margin: 0; font-size: 1.1em; font-weight: 600; }
+        .card-counter { font-size: 0.9em; color: var(--light-text-color); font-weight: 500; }
+        .start-test-btn {
+            background: var(--gradient-bg); color: white; text-decoration: none; padding: 8px 20px;
+            border-radius: 50px; font-size: 0.9em; font-weight: 600;
+            box-shadow: 0 4px 15px rgba(67, 24, 255, 0.2); transition: all 0.3s ease;
+        }
+        .start-test-btn:hover { transform: scale(1.05); }
+        .no-results { text-align: center; padding: 20px; color: var(--light-text-color); font-size: 1.1em; }
+        .app-footer {
+            text-align: center; padding: 20px; margin-top: 30px; font-size: 0.9em; /* <-- FONT SIZE REDUCED */
+            color: var(--light-text-color); font-weight: 500;
+        }
+        .footer-link {
+            color: var(--primary-color); text-decoration: none; font-weight: 600; /* <-- FONT WEIGHT REDUCED */
+            font-size: 1em; /* <-- FONT SIZE ADJUSTED */
+            transition: all 0.3s ease;
+        }
+        .footer-link:hover { text-decoration: underline; text-decoration-color: var(--secondary-color); opacity: 0.9; }
+        
+        @media (max-width: 768px) {
+            .container { padding-top: 130px; padding-left:10px; padding-right:10px;}
+            .app-header { flex-direction: column; gap: 10px; padding: 15px; } /* <-- REVERTED TO PREVIOUS STYLE */
+            .view-heading { font-size: 1.5em; }
+            .card-list-item h3 { font-size: 1em; }
+        }
+        @media (max-width: 420px) {
+            .app-footer { display: flex; flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="preloader"><div class="spinner"></div></div>
+
+    <header class="app-header">
+        <h1>Kundan Test Series Hub</h1>
+        <a href="https://t.me/kundan_yadav_bot" target="_blank" class="telegram-btn" rel="noopener noreferrer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.426 1.426 0 0 0-.013-.315.337.337 0 0 0-.114-.217.526.526 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09z"/></svg>
+            Contact On Telegram
+        </a>
+    </header>
+
+    <div class="container">
+        <div id="home-view" class="view">
+            <div class="search-wrapper">
+                <span class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
+                <input type="search" id="exam-search" class="search-input" placeholder="परीक्षा या विषय खोजें...">
+            </div>
+            <ul id="exam-list-container" class="card-list"></ul>
+            <div id="no-exam-results" class="no-results hidden">कोई परिणाम नहीं मिला।</div>
+        </div>
+        <div id="subject-view" class="view hidden"></div>
+        <div id="test-list-view" class="view hidden"></div>
+    </div>
+    
+    <footer class="app-footer">
+        <span>© 2025 | Developed with ❤️ by</span>
+        <a href="https://instagram.com/babubhaikundan" target="_blank" class="footer-link" rel="noopener noreferrer">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</a>
+    </footer>
+
+    <script>
+    const testData = {
+        "ssc_je": {
+            name: "SSC JE Exam (Civil)",
+            subjects: {
+                "bmc": { name: "Building Materials (BMC)", tests: [] }, "estimating": { name: "Estimating and Costing", tests: [] },
+                "surveying": { name: "Surveying", tests: [] }, "soil": { name: "Soil Mechanics", tests: [] },
+                "hydrology": { name: "Hydrology", tests: [] }, "irrigation": { name: "Irrigation Engineering", tests: [] },
+                "transportation": { name: "Transportation Engineering", tests: [] }, "evs": { name: "Environmental Engineering (EVS)", tests: [] },
+                "som": { name: "Strength of Materials (SOM)", tests: [] }, "concrete": { name: "Concrete Technology", tests: [] },
+                "rcc": { name: "RCC Design", tests: [] }, "steel": { name: "Steel Design", tests: [] },
+                "fm": { name: "Fluid Mechanics", tests: [] }, "tos": { name: "Theory of Structures (TOS)", tests: [] },
+                "eng_mech": { name: "Engineering Mechanics", tests: [] },
+            }
+        },
+        "ssc_cgl": {
+            name: "SSC CGL / CHSL",
+            subjects: {
+                "gen_science": { name: "General Science", tests: [] }, "gen_awareness": { name: "General Awareness", tests: [] },
+                "reasoning": { name: "Reasoning", tests: [] }, "maths": { name: "Maths", tests: [] },
+                "hindi": { name: "Hindi", tests: [] }, "english": { name: "English", tests: [] },
+            }
+        },
+        "banking": { 
+            name: "Banking Exams (IBPS, SBI)", 
+            subjects: {
+                "gen_science": { name: "General Science", tests: [] }, "gen_awareness": { name: "General Awareness", tests: [] },
+                "reasoning": { name: "Reasoning", tests: [] }, "maths": { name: "Maths", tests: [] },
+                "hindi": { name: "Hindi", tests: [] }, "english": { name: "English", tests: [] },
+            }
+        },
+        "railways": { 
+            name: "Railway Exams (RRB)", 
+            subjects: {
+                "gen_science": { name: "General Science", tests: [] }, "gen_awareness": { name: "General Awareness", tests: [] },
+                "reasoning": { name: "Reasoning", tests: [] }, "maths": { name: "Maths", tests: [] },
+                "hindi": { name: "Hindi", tests: [] }, "english": { name: "English", tests: [] },
+            }
+        }
+    };
+    
+    window.addEventListener('load', () => {
+        const preloader = document.getElementById('preloader');
+        preloader.style.opacity = '0';
+        setTimeout(() => { preloader.style.display = 'none'; }, 500);
+        document.body.classList.add('loaded');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const views = { home: document.getElementById('home-view'), subjects: document.getElementById('subject-view'), tests: document.getElementById('test-list-view') };
+        const searchInput = document.getElementById('exam-search');
+        let currentState = { examKey: null, subjectKey: null };
+
+        const iconBook = `<div class="card-list-item-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.51.989 2.51 2.246 0 1.087-.675 1.928-1.668 2.372a.5.5 0 0 0-.416.492v1.59a.5.5 0 0 0 .416.492c.993.444 1.668 1.285 1.668 2.372 0 1.257-1.277 2.122-2.51 2.246-1.33.134-2.458-.063-3.112-.752V2.687zM8 1.783C7.015 1.1 5.587.823 4.29.96c-1.23.124-2.29.956-2.29 2.06 0 1.02.64 1.836 1.57 2.273a.5.5 0 0 0 .33.025h.57a.5.5 0 0 0 .5-.5V2.306a.5.5 0 0 0-.254-.435c-.495-.29-.825-.635-.825-1.007 0-.42-.322-.753-.753-.753S.5 1.12.5 1.541v12.918c0 .42.322.753.753.753s.753-.333.753-.753V9.563a.5.5 0 0 0-.254-.435c-.495-.29-.825-.635-.825-1.007 0-.42.322-.753.753-.753s.753.333.753.753v3.437a.5.5 0 0 0 .5.5h.57a.5.5 0 0 0 .33-.025C3.65 12.43 4.29 13.246 4.29 14.266c0 1.104 1.06 1.936 2.29 2.06 1.297.137 2.725-.16 3.71-.823V1.783z"/></svg></div>`;
+        const iconChevron = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>`;
+        const iconBack = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>`;
+
+        const showView = (viewName) => {
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+
+        const renderHomePage = () => {
+            const container = document.getElementById('exam-list-container');
+            container.innerHTML = '';
+            Object.keys(testData).forEach((examKey, index) => {
+                const exam = testData[examKey];
+                const subjectCount = Object.keys(exam.subjects).length;
+                const listItem = document.createElement('li');
+                listItem.className = 'card-list-item';
+                listItem.dataset.exam = examKey;
+                listItem.style.animationDelay = `${index * 0.05}s`;
+                listItem.innerHTML = `<div class="card-list-item-content"><div><h3>${exam.name}</h3><span class="card-counter">${subjectCount} Subjects</span></div></div>${iconChevron}`;
+                container.appendChild(listItem);
+            });
+            container.addEventListener('click', (e) => {
+                const target = e.target.closest('.card-list-item');
+                if (target) { currentState.examKey = target.dataset.exam; renderSubjectPage(); }
+            });
+            showView('home');
+        };
+
+        const renderSubjectPage = () => {
+            const exam = testData[currentState.examKey];
+            let listHTML = '';
+            Object.keys(exam.subjects).forEach((subjectKey, index) => {
+                const subject = exam.subjects[subjectKey];
+                listHTML += `<li class="card-list-item" data-subject="${subjectKey}" style="animation-delay: ${index * 0.05}s"><div class="card-list-item-content">${iconBook}<div><h3>${subject.name}</h3><span class="card-counter">${subject.tests.length} Tests</span></div></div>${iconChevron}</li>`;
+            });
+            views.subjects.innerHTML = `<button class="back-btn" id="back-to-home">${iconBack} सभी परीक्षाएँ</button><h2 class="view-heading">${exam.name}</h2><ul class="card-list">${listHTML}</ul>`;
+            views.subjects.querySelector('#back-to-home').addEventListener('click', renderHomePage);
+            views.subjects.querySelector('.card-list').addEventListener('click', (e) => {
+                const target = e.target.closest('.card-list-item');
+                if(target) { currentState.subjectKey = target.dataset.subject; renderTestListPage(); }
+            });
+            showView('subjects');
+        };
+        
+        const renderTestListPage = () => {
+            const exam = testData[currentState.examKey];
+            const subject = exam.subjects[currentState.subjectKey];
+            let listHTML = subject.tests.length > 0 
+                ? subject.tests.map((test, index) => `<li class="card-list-item" style="animation-delay: ${index * 0.05}s"><div class="card-list-item-content">${iconBook}<h3>${test.name}</h3></div><a href="${test.file}" target="_blank" class="start-test-btn">Start Test</a></li>`).join('') 
+                : `<div class="no-results">इस विषय में कोई टेस्ट उपलब्ध नहीं है।</div>`;
+            views.tests.innerHTML = `<button class="back-btn" id="back-to-subjects">${iconBack} सभी विषय</button><h2 class="view-heading">${subject.name}</h2><p class="view-subheading">${exam.name}</p><ul class="card-list">${listHTML}</ul>`;
+            views.tests.querySelector('#back-to-subjects').addEventListener('click', renderSubjectPage);
+            showView('tests');
+        };
+
+        const filterExams = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const examListContainer = document.getElementById('exam-list-container');
+            const noResultsEl = document.getElementById('no-exam-results');
+            let visibleCount = 0;
+            
+            Object.keys(testData).forEach(examKey => {
+                const exam = testData[examKey];
+                const examItem = examListContainer.querySelector(`[data-exam="${examKey}"]`);
+                let isMatch = exam.name.toLowerCase().includes(searchTerm);
+                if (!isMatch) {
+                    for (const subjectKey in exam.subjects) {
+                        if (exam.subjects[subjectKey].name.toLowerCase().includes(searchTerm)) {
+                            isMatch = true; break;
+                        }
+                    }
+                }
+                if (examItem) {
+                    examItem.style.display = isMatch ? 'flex' : 'none';
+                    if (isMatch) visibleCount++;
+                }
+            });
+            noResultsEl.classList.toggle('hidden', visibleCount > 0);
+        };
+        
+        searchInput.addEventListener('input', filterExams);
+        renderHomePage();
+    });
+    </script>
+</body>
+</html>
