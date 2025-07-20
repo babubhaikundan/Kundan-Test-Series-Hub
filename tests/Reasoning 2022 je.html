@@ -127,7 +127,7 @@
     <script>
         const questions = []; const totalQuestions = 50;
         let currentLang = "en"; let currentQuestion = 0; let answers = {}; let submitted = false;
-        let totalTime = 50 * 60; let timeSpent = {}; let questionTimer; let timeOnCurrentQuestion = 0;
+        let totalTime = 40 * 60; let timeSpent = {}; let questionTimer; let timeOnCurrentQuestion = 0;
         
         window.onload = function() { initializeTest(); startTimer(); handleResize(); window.addEventListener('resize', handleResize); };
         function handleResize() { const nav = document.getElementById('question-nav'); if (window.innerWidth >= 992) { nav.classList.add('show'); } else { nav.classList.remove('show'); } }
