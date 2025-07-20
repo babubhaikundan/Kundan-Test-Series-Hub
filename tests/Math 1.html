@@ -1,0 +1,2949 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mocks Test Maths</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+
+        :root {
+
+            --primary: #6c5ce7;
+
+            --primary-light: #a29bfe;
+
+            --primary-dark: #5649c0;
+
+            --secondary: #00cec9;
+
+            --accent: #fd79a8;
+
+            --success: #00b894;
+
+            --warning: #fdcb6e;
+
+            --danger: #d63031;
+
+            --light: #f8f9fa;
+
+            --dark: #2d3436;
+
+            --gray: #636e72;
+
+            --light-gray: #dfe6e9;
+
+            --card-bg: #ffffff;
+
+            --body-bg: #f5f6fa;
+
+            --header-bg: linear-gradient(135deg, var(--primary), var(--primary-dark));
+
+            --footer-bg: #ffffff;
+
+            --box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+
+            --box-shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+        }
+
+        
+
+        * {
+
+            -webkit-tap-highlight-color: transparent;
+
+        }
+
+        
+
+        body {
+
+            background-color: var(--body-bg);
+
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+
+            color: var(--dark);
+
+            line-height: 1.6;
+
+            padding-bottom: 80px; /* Space for fixed navigation */
+
+            overflow-x: hidden;
+
+        }
+
+        
+
+        /* Header Styles */
+
+        .header {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 60px;
+
+            background: var(--header-bg);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 16px;
+
+            z-index: 1000;
+
+            box-shadow: var(--box-shadow-sm);
+
+        }
+
+        
+
+        .header-content {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            width: 100%;
+
+        }
+
+        
+
+        .header-brand {
+
+            display: flex;
+
+            align-items: center;
+
+            font-weight: 600;
+
+            font-size: 1.1rem;
+
+            color: white;
+
+            text-decoration: none;
+
+        }
+
+        
+
+        .header-brand i {
+
+            margin-right: 8px;
+
+            font-size: 1.2rem;
+
+        }
+
+        
+
+        .header-controls {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+
+        
+
+        .control-btn {
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 50%;
+
+            background: rgba(255,255,255,0.1);
+
+            border: none;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+
+        }
+
+        
+
+        .control-btn:hover {
+
+            background: rgba(255,255,255,0.2);
+
+        }
+
+        
+
+        .control-btn.active {
+
+            background: rgba(255,255,255,0.3);
+
+        }
+
+        
+
+        .timer-display {
+
+            background: rgba(0,0,0,0.2);
+
+            border-radius: 18px;
+
+            padding: 4px 12px;
+
+            font-size: 0.85rem;
+
+            font-weight: 500;
+
+            display: flex;
+
+            align-items: center;
+
+            white-space: nowrap;
+
+        }
+
+        
+
+        .timer-display i {
+
+            margin-right: 6px;
+
+        }
+
+        
+
+        /* Main Content */
+
+        .main-content {
+
+            margin-top: 60px;
+
+            padding: 16px;
+
+            min-height: calc(100vh - 140px);
+
+        }
+
+        
+
+        .question-card {
+
+            background: var(--card-bg);
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+            margin-bottom: 16px;
+
+            box-shadow: var(--box-shadow-sm);
+
+            border: none;
+
+            transition: var(--transition);
+
+        }
+
+        
+
+        .question-counter {
+
+            font-size: 0.9rem;
+
+            color: var(--gray);
+
+            text-align: center;
+
+            margin-bottom: 16px;
+
+            font-weight: 500;
+
+        }
+
+        
+
+        .question-text {
+
+            font-size: 1.1rem;
+
+            line-height: 1.6;
+
+            margin-bottom: 20px;
+
+            color: var(--dark);
+
+        }
+
+        
+
+        .option-item {
+
+            margin-bottom: 12px;
+
+            position: relative;
+
+        }
+
+        
+
+        .option-input {
+
+            position: absolute;
+
+            opacity: 0;
+
+            width: 0;
+
+            height: 0;
+
+        }
+
+        
+
+            .question-text {
+
+        overflow-wrap: break-word;
+
+        word-wrap: break-word;
+
+        hyphens: auto;
+
+        max-width: 100%;
+
+    }
+
+    .question-text img,
+
+    .option-label img {
+
+        max-width: 100%;
+
+        height: auto;
+
+        display: block;
+
+        margin: 8px 0;
+
+        border-radius: 8px;
+
+    }
+
+    .option-label {
+
+        overflow: hidden;
+
+    }
+
+    .question-card {
+
+        overflow: hidden;
+
+    }
+
+        
+
+        .option-label {
+
+            display: block;
+
+            padding: 14px 16px;
+
+            background: var(--card-bg);
+
+            border: 1px solid var(--light-gray);
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        
+
+        .option-label:hover {
+
+            border-color: var(--primary-light);
+
+            transform: translateY(-2px);
+
+            box-shadow: var(--box-shadow-sm);
+
+        }
+
+        
+
+        .option-input:checked + .option-label {
+
+            border-color: var(--primary);
+
+            background: rgba(108, 92, 231, 0.05);
+
+            box-shadow: 0 0 0 1px var(--primary);
+
+        }
+
+        
+
+        .option-input:checked + .option-label::after {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 3px;
+
+            height: 100%;
+
+            background: var(--primary);
+
+        }
+
+        
+
+        /* When reviewing answers */
+
+        .review-mode .option-input:checked + .option-label.correct {
+
+            border-color: var(--success);
+
+            background: rgba(0, 184, 148, 0.05);
+
+            box-shadow: 0 0 0 1px var(--success);
+
+        }
+
+        
+
+        .review-mode .option-input:checked + .option-label.correct::after {
+
+            background: var(--success);
+
+        }
+
+        
+
+        .review-mode .option-input:checked + .option-label.incorrect {
+
+            border-color: var(--danger);
+
+            background: rgba(214, 48, 49, 0.05);
+
+            box-shadow: 0 0 0 1px var(--danger);
+
+        }
+
+        
+
+        .MathJax, .mjx-chtml {
+
+            overflow-x: auto;
+
+            max-width: 100%;
+
+            display: inline-block;
+
+        }
+
+        
+
+        .review-mode .option-input:checked + .option-label.incorrect::after {
+
+            background: var(--danger);
+
+        }
+
+        
+
+        .review-mode .option-label.correct-answer {
+
+            border-color: var(--success);
+
+            background: rgba(0, 184, 148, 0.05);
+
+            box-shadow: 0 0 0 1px var(--success);
+
+        }
+
+        
+
+        .review-mode .option-label.correct-answer::after {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 3px;
+
+            height: 100%;
+
+            background: var(--success);
+
+        }
+
+        
+
+        .solution-container {
+
+            margin-top: 20px;
+
+            padding: 16px;
+
+            background: rgba(108, 92, 231, 0.05);
+
+            border-radius: 12px;
+
+            border-left: 3px solid var(--primary);
+
+        }
+
+        
+
+        .solution-title {
+
+            font-weight: 600;
+
+            margin-bottom: 8px;
+
+            color: var(--primary);
+
+        }
+
+        
+
+        /* Question Navigation */
+
+        .question-nav {
+
+            position: fixed;
+
+            top: 60px;
+
+            right: 0;
+
+            bottom: 80px;
+
+            width: 100%;
+
+            max-width: 320px;
+
+            background: var(--card-bg);
+
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+
+            transform: translateX(100%);
+
+            transition: var(--transition);
+
+            z-index: 900;
+
+            overflow-y: auto;
+
+            padding: 16px;
+
+        }
+
+        
+
+        .question-nav.show {
+
+            transform: translateX(0);
+
+        }
+
+        
+
+        .nav-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 16px;
+
+        }
+
+        
+
+        .nav-title {
+
+            font-weight: 600;
+
+            font-size: 1.1rem;
+
+            margin: 0;
+
+        }
+
+        
+
+        .question-stats {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+        
+
+        .stat-badge {
+
+            font-size: 0.75rem;
+
+            padding: 4px 8px;
+
+            border-radius: 12px;
+
+            font-weight: 500;
+
+        }
+
+        
+
+        .section-selector {
+
+            width: 100%;
+
+            margin-bottom: 16px;
+
+            border-radius: 12px;
+
+            padding: 10px 16px;
+
+            border: 1px solid var(--light-gray);
+
+            background: var(--card-bg);
+
+            font-size: 0.9rem;
+
+            appearance: none;
+
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+
+            background-repeat: no-repeat;
+
+            background-position: right 10px center;
+
+            background-size: 16px;
+
+        }
+
+        
+
+        .question-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+
+            gap: 8px;
+
+        }
+
+        
+
+        .q-box {
+
+            width: 40px;
+
+            height: 40px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-weight: 500;
+
+            border: 1px solid var(--light-gray);
+
+            background: var(--card-bg);
+
+            transition: var(--transition);
+
+            position: relative;
+
+        }
+
+        
+
+        .q-box:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: var(--box-shadow-sm);
+
+        }
+
+        
+
+        .q-box.attempted {
+
+            background-color: var(--primary);
+
+            color: white;
+
+            border-color: var(--primary);
+
+        }
+
+        
+
+        .q-box.correct {
+
+            background-color: var(--success);
+
+            color: white;
+
+            border-color: var(--success);
+
+        }
+
+        
+
+        .q-box.incorrect {
+
+            background-color: var(--danger);
+
+            color: white;
+
+            border-color: var(--danger);
+
+        }
+
+        
+
+        .q-box.current {
+
+            border: 2px solid var(--accent) !important;
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+
+        }
+
+        
+
+        .q-box.unattempted {
+
+            background-color: var(--gray);
+
+            color: white;
+
+            border-color: var(--gray);
+
+        }
+
+        
+
+        /* Bottom Navigation */
+
+        .bottom-nav {
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 80px;
+
+            background: var(--footer-bg);
+
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 16px;
+
+            z-index: 800;
+
+        }
+
+        
+
+        .nav-btn {
+
+            height: 48px;
+
+            border-radius: 12px;
+
+            border: none;
+
+            font-weight: 500;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0 20px;
+
+            transition: var(--transition);
+
+            gap: 8px;
+
+        }
+
+        
+
+        .nav-btn i {
+
+            font-size: 1rem;
+
+        }
+
+        
+
+        .nav-btn-primary {
+
+            background: var(--primary);
+
+            color: white;
+
+        }
+
+        
+
+        .nav-btn-primary:hover {
+
+            background: var(--primary-dark);
+
+            transform: translateY(-2px);
+
+        }
+
+        
+
+        .nav-btn-outline {
+
+            background: transparent;
+
+            color: var(--primary);
+
+            border: 1px solid var(--primary);
+
+        }
+
+        
+
+        .nav-btn-outline:hover {
+
+            background: rgba(108, 92, 231, 0.1);
+
+            transform: translateY(-2px);
+
+        }
+
+        
+
+        .nav-btn:disabled {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+
+            transform: none !important;
+
+        }
+
+        
+
+        /* Overlay when nav is open */
+
+        .nav-overlay {
+
+            position: fixed;
+
+            top: 60px;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 80px;
+
+            background: rgba(0,0,0,0.5);
+
+            z-index: 800;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition: var(--transition);
+
+        }
+
+        
+
+        .nav-overlay.show {
+
+            opacity: 1;
+
+            pointer-events: all;
+
+        }
+
+        
+
+        /* Results Modal */
+
+        .results-modal {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            background: rgba(0,0,0,0.7);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            z-index: 1100;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition: var(--transition);
+
+            padding: 16px;
+
+        }
+
+        
+
+        .results-modal.show {
+
+            opacity: 1;
+
+            pointer-events: all;
+
+        }
+
+        
+
+        .results-card {
+
+            background: white;
+
+            border-radius: 20px;
+
+            width: 100%;
+
+            max-width: 500px;
+
+            overflow: hidden;
+
+            transform: translateY(20px);
+
+            transition: var(--transition);
+
+        }
+
+        
+
+        .results-modal.show .results-card {
+
+            transform: translateY(0);
+
+        }
+
+        
+
+        .results-header {
+
+            background: var(--header-bg);
+
+            color: white;
+
+            padding: 20px;
+
+            text-align: center;
+
+        }
+
+        
+
+        .results-title {
+
+            margin: 0;
+
+            font-weight: 600;
+
+        }
+
+        
+
+        .results-body {
+
+            padding: 20px;
+
+        }
+
+        
+
+        .stats-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 20px;
+
+        }
+
+        
+
+        .stat-card {
+
+            padding: 16px;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            color: white;
+
+            box-shadow: var(--box-shadow-sm);
+
+        }
+
+        
+
+        .stat-value {
+
+            font-size: 1.5rem;
+
+            font-weight: 700;
+
+            margin-bottom: 4px;
+
+        }
+
+        
+
+        .stat-label {
+
+            font-size: 0.8rem;
+
+            opacity: 0.9;
+
+        }
+
+        
+
+        .results-footer {
+
+            padding: 16px 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            border-top: 1px solid var(--light-gray);
+
+        }
+
+        
+
+        /* Responsive Adjustments */
+
+        @media (min-width: 992px) {
+
+            .question-nav {
+
+                transform: translateX(0);
+
+            }
+
+            
+
+            .main-content {
+
+                margin-right: 320px;
+
+            }
+
+            
+
+            .nav-overlay {
+
+                display: none;
+
+            }
+
+            
+
+            .bottom-nav {
+
+                display: none;
+
+            }
+
+        }
+
+        
+
+        @media (max-width: 576px) {
+
+            .question-grid {
+
+                grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+
+                gap: 6px;
+
+            }
+
+            
+
+            .q-box {
+
+                width: 36px;
+
+                height: 36px;
+
+                font-size: 0.9rem;
+
+            }
+
+            
+
+            .option-label {
+
+                padding: 12px 14px;
+
+            }
+
+            
+
+            .question-text {
+
+                font-size: 1rem;
+
+            }
+
+            
+
+            .header-brand {
+
+                font-size: 1rem;
+
+            }
+
+            
+
+            .control-btn {
+
+                width: 32px;
+
+                height: 32px;
+
+            }
+
+            
+
+            .timer-display {
+
+                font-size: 0.8rem;
+
+                padding: 4px 10px;
+
+            }
+
+            
+
+            .nav-btn {
+
+                height: 44px;
+
+                padding: 0 16px;
+
+                font-size: 0.9rem;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <header class="header">
+
+        <div class="header-content">
+
+            <a href="https://t.me/kundan_yadav_bot" class="header-brand">
+
+                <i class="fas fa-graduation-cap"></i>
+
+                <span>SSC CGL MATHS Previous Year</span>
+
+            </a>
+
+            
+
+            <div class="header-controls">
+
+                <!-- Timer -->
+
+                <div class="timer-display">
+
+                    <i class="far fa-clock"></i>
+
+                    <span id="timer-display">25:00</span>
+
+                </div>
+
+                
+
+                <!-- Language toggle -->
+
+                <button class="control-btn" id="lang-btn" onclick="toggleLanguage()">
+
+                    <span id="lang-text">En</span>
+
+                </button>
+
+                
+
+                <!-- Submit button -->
+
+                <button class="control-btn" id="submit-btn" onclick="confirmSubmit()">
+
+                    <i class="fas fa-paper-plane"></i>
+
+                </button>
+
+                
+
+                <!-- Questions toggle for mobile -->
+
+                <button class="control-btn nav-toggle-btn" id="nav-toggle" onclick="toggleNav()">
+
+                    <i class="fas fa-th"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    
+
+    <!-- Main content -->
+
+    <main class="main-content" id="main-content">
+
+        <div class="question-counter" id="question-counter">Question 1 of 25</div>
+
+        
+
+        <!-- Questions will be displayed here -->
+
+        <div id="questions-container"></div>
+
+    </main>
+
+    
+
+    <!-- Overlay for mobile nav -->
+
+    <div class="nav-overlay" id="nav-overlay" onclick="toggleNav(false)"></div>
+
+    
+
+    <!-- Question navigation sidebar -->
+
+    <aside class="question-nav" id="question-nav">
+
+        <div class="nav-header">
+
+            <h3 class="nav-title">Questions</h3>
+
+            <div class="question-stats">
+
+                <span class="stat-badge bg-primary" id="attempted-count">0</span>
+
+                <span class="stat-badge bg-gray" id="total-count">25</span>
+
+                <button class="control-btn d-lg-none" onclick="toggleNav(false)">
+
+                    <i class="fas fa-times"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- Section selector -->
+
+        <select class="section-selector" id="section-selector" onchange="switchSection(this.value)">
+
+            <option value="all">All Sections</option>
+
+        </select>
+
+        
+
+        <!-- Question grid -->
+
+        <div class="question-grid" id="question-boxes"></div>
+
+    </aside>
+
+    
+
+    <!-- Bottom navigation for mobile -->
+
+    <nav class="bottom-nav d-lg-none">
+
+        <button class="nav-btn nav-btn-outline" onclick="prevQuestion()">
+
+            <i class="fas fa-chevron-left"></i>
+
+            <span>Previous</span>
+
+        </button>
+
+        <button class="nav-btn nav-btn-outline" onclick="nextQuestion()">
+
+            <span>Next</span>
+
+            <i class="fas fa-chevron-right"></i>
+
+        </button>
+
+    </nav>
+
+    
+
+    <!-- Results modal -->
+
+    <div class="results-modal" id="results-modal">
+
+        <div class="results-card">
+
+            <div class="results-header">
+
+                <h3 class="results-title">Test Results</h3>
+
+            </div>
+
+            <div class="results-body">
+
+                <div class="stats-grid">
+
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark))">
+
+                        <div class="stat-value" id="score-value">0</div>
+
+                        <div class="stat-label">Score</div>
+
+                    </div>
+
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--success), #1b9aaa)">
+
+                        <div class="stat-value" id="correct-value">0</div>
+
+                        <div class="stat-label">Correct</div>
+
+                    </div>
+
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--danger), var(--accent))">
+
+                        <div class="stat-value" id="incorrect-value">0</div>
+
+                        <div class="stat-label">Incorrect</div>
+
+                    </div>
+
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--gray), var(--dark))">
+
+                        <div class="stat-value" id="unattempted-value">0</div>
+
+                        <div class="stat-label">Unattempted</div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="results-footer">
+
+                <button class="nav-btn nav-btn-primary" onclick="reviewTest()">
+
+                    <i class="fas fa-search me-1"></i>
+
+                    <span>Review Test</span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+        // Questions data
+
+        const questions = [];
+
+        const sections = {};
+
+        let currentLang = "en";
+
+        let currentQuestion = 0;
+
+        let answers = {};
+
+        let submitted = false;
+
+        let totalTime = 25 * 60;
+
+        
+
+        // Initialize the test
+
+        window.onload = function() {
+
+            initializeTest();
+
+            startTimer();
+
+            
+
+            // If on desktop, show the question navigation by default
+
+            if (window.innerWidth >= 992) {
+
+                document.getElementById('question-nav').classList.add('show');
+
+                document.getElementById('main-content').classList.add('with-nav');
+
+            }
+
+        };
+
+        
+
+        // Initialize test data
+
+        function initializeTest() {
+
+            // Add sections and questions
+
+            
+
+            sections["17"] = {
+
+                name: "Quantitative Aptitude",
+
+                start: 0,
+
+                end: 23
+
+            };
+
+            
+
+            document.getElementById('section-selector').innerHTML += 
+
+                `<option value="17">Quantitative Aptitude</option>`;
+
+            
+
+            sections["misc"] = {
+
+                name: "Miscellaneous",
+
+                start: 24,
+
+                end: 24
+
+            };
+
+            
+
+            document.getElementById('section-selector').innerHTML += 
+
+                `<option value="misc">Miscellaneous</option>`;
+
+            
+
+            
+
+                questions.push({
+
+                    id: "1",
+
+                    section: "17",
+
+                    question_en: "1. Which of the following statements is sufficient to conclude that two triangles are congruent?",
+
+                    question_hi: "1. निम्नलिखित में से कौन-सा कथन यह निष्कर्ष निकालने के लिए पर्याप्त है कि दो त्रिभुज सर्वांगसम हैं?",
+
+                    options_en: [" These have two equal sides and the same perimeter", " These have the same area and the same base.", 
+
+                                " One side and one angle of both triangles are equal.", " These have the same base and the same height. "],
+
+                    options_hi: [" इनकी दो भुजाएँ बराबर हैं और परिमाप समान है। ", " इनके क्षेत्रफल और आधार समान हैं।",
+
+                                " दोनों त्रिभुजों की एक भुजा और एक कोण बराबर हैं।", " इनके आधार और ऊँचाई समान हैं। "],
+
+                    solution_en: "1.(a) If two sides of both triangles are equal, and the perimeter is the same, the third side must also be equal because the perimeter is the sum of all sides. Therefore, all three sides of both triangles would be equal, satisfying the SSS (Side-Side-Side) congruence condition.<br />So, Option (a) is sufficient to conclude that the two triangles are congruent.",
+
+                    solution_hi: "1.(a) यदि दोनों त्रिभुजों की दो भुजाएँ बराबर तथा परिमाप समान है , तो तीसरी भुजा भी बराबर होंगी क्योंकि परिमाप सभी भुजाओं का योग है। इसलिए, SSS (भुजा-भुजा-भुजा) सर्वांगसमता की स्थिति को संतुष्ट करते हुए, दोनों त्रिकोणों की सभी तीन भुजाएं बराबर होंगी।<br />इसलिए, विकल्प (a) यह निष्कर्ष निकालने के लिए पर्याप्त है कि दोनों त्रिभुज सर्वांगसम हैं।",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "2",
+
+                    section: "17",
+
+                    question_en: "<p>2. The average marks (out of 100) of boys and girls in an examination are 75 and 80, respectively. If the average marks of all the students in that examination are 78. Find the ratio of the number of boys to the number of girls.</p>",
+
+                    question_hi: "<p>2. एक परीक्षा में लड़कों और लड़कियों के औसत अंक (100 में से) क्रमशः 75 और 80 हैं। यदि उस परीक्षा में सभी विद्यार्थियों के औसत अंक 78 हों तो लड़कों की संख्या और लड़कियों की संख्या का अनुपात ज्ञात कीजिए।</p>",
+
+                    options_en: ["<p>2 : 3</p>", "<p>3 : 4</p>", 
+
+                                "<p>1 : 3</p>", "<p>1 : 2</p>"],
+
+                    options_hi: ["<p>2 : 3</p>", "<p>3 : 4</p>",
+
+                                "<p>1 : 3</p>", "<p>1 : 2</p>"],
+
+                    solution_en: "<p>2.(a)<br><strong id=\"docs-internal-guid-4f8683ac-7fff-81f0-cc91-25e3a781f543\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXdfdudItL0guwYekRqfcxpANvG5orLuw5S0bDKxi1qf-W1571WJYSWgfVlq-l9d_l9SaySpe6Zp0Y4eVp__wc__1sTAXrf2ai0DN37_9RCcpejsHMA7NJYM6oXuTm96DqWZqZp4egwfXpeaxMT18JYpOa7I?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"95\" height=\"126\"></strong><br>Required ratio = 2 : 3</p>",
+
+                    solution_hi: "<p>2.(a)<br><strong id=\"docs-internal-guid-06875dd0-7fff-9a17-585d-df2715f7c889\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXeq_QCibRJitgwQyZCQzNajgeqBLys68N3N5Cj0QyylYyitFUZuMjjiil71ESDTZlOHSyuqPVZQ4ZgQ4rxvMWlnhiMXDjCk1W2TS8MvFa4EqKmf47DC2P7cY7mgrNLVDqjd1IQVaq79q3GPx4cWG62cql0?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"109\" height=\"124\"></strong><br>लड़कों तथा लड़कियों की संख्या का अनुपात. = 2 : 3</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "3",
+
+                    section: "17",
+
+                    question_en: "3. If the sum of two sides of an equilateral triangle is 16 cm, then find the third side.",
+
+                    question_hi: "3. यदि एक समबाहु त्रिभुज की दो भुजाओं का योग 16 cm है, तो तीसरी भुजा ज्ञात कीजिए।",
+
+                    options_en: [" 1. 4 cm ", " 16 cm", 
+
+                                " Cannot be found", " 8 cm"],
+
+                    options_hi: [" 1. 4 cm ", " 16 cm",
+
+                                " ज्ञात नहीं किया जा सकता है", " 8 cm"],
+
+                    solution_en: "3.(d) Let the side of an equilateral triangle be <math display=\"inline\"><mi>x</mi></math><br />According to the question,<br />2<math display=\"inline\"><mi>x</mi></math> = 16<br /><math display=\"inline\"><mi>x</mi></math> = 8 cm<br />We know that an equilateral triangle all side equal to each other so the third side will be 8 cm.",
+
+                    solution_hi: "3.(d) <br />माना , समबाहु त्रिभुज की भुजा = x <br />प्रश्न के अनुसार,<br />2x = 16<br />x = 8 सेमी<br />हम जानते हैं कि एक समबाहु त्रिभुज की सभी भुजाएँ एक दूसरे के बराबर होती हैं इसलिए तीसरी भुजा 8 सेमी होगी।  ",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "4",
+
+                    section: "17",
+
+                    question_en: "<p>4. The following table shows the total candidates appeared and number of candidates present, in different exam centres &ndash; P, Q and R. Study the table and answer the question that follows.<br><strong id=\"docs-internal-guid-59b4ce39-7fff-1f27-69f5-6d93c54a0301\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXdpwB2Z8X0DkAc4eqjoGMQQWmChU0-Ily9sLt_WetrekzdKYWpB71GzePA2uEQAHgEffL4-stCoCWdw7GV1FB8LTr0DPtXFIiIavgLnWfKQCwr7aeFUGPh54P4Y8FX3Tiw4gB1I33JcjAZVQQLb3RIxVkth?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"363\" height=\"148\"></strong><br>&lsquo;Total&rsquo; denotes total candidates applied for the centre,&lsquo;Present&rsquo; denotes the candidates appeared. In which year was the number of absentees the second highest in total of all centres?</p>",
+
+                    question_hi: "<p>4. निम्नलिखित तालिका विभिन्न परीक्षा केंद्रों P, Q और R में कुल उपस्थित उम्मीदवारों और उपस्थित उम्मीदवारों की संख्या को दर्शाती है। तालिका का अध्ययन कीजिए और निम्नलिखित प्रश्न का उत्तर दीजिए।<br><strong id=\"docs-internal-guid-c3fb0b21-7fff-3b76-6af0-9b9f76189b60\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXcCAMzjZ47DUv6Z8S6MtdYa__0pTDWsMQzVVAHui4aJQ7Yywuo1I69mmSRJilc5fjMoy6QSD_-PYrgdQXABzCR5Pv8aAoyluuTXBmv5_aR8GATPq2FD5-rSegJdT2ktNPP34vqGTrRwOFOgGv48N8Jgmkpz?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"357\" height=\"160\"></strong><br>\'कुल\' केंद्र के लिए आवेदन करने वाले कुल उम्मीदवारों को दर्शाता है, \'उपस्थित\' उपस्थित उम्मीदवारों को दर्शाता है।<br>किस वर्ष में सभी केन्द्रों में अनुपस्थित रहने वालों की संख्या दूसरी सबसे अधिक थी?</p>",
+
+                    options_en: ["<p>2018</p>", "<p>2017</p>", 
+
+                                "<p>2020</p>", "<p>2019</p>"],
+
+                    options_hi: ["<p>2018</p>", "<p>2017</p>",
+
+                                "<p>2020</p>", "<p>2019</p>"],
+
+                    solution_en: "<p>4.(d)<br>The number of absentees in 2018 = (64 + 65 + 65) - (60 + 45 + 55) = 34<br>The number of absentees in 2017 = (50 + 75 + 45) - (45 + 55 + 40) = 30 <br>The number of absentees in 2020 = (55 + 80 + 90) - (44 + 66 + 85) = 30<br>The number of absentees in 2019 = (80 + 84 + 70) - (69 + 72 + 62) = 31<br>It is clear from the above expression that in 2019 the number of absentees is the second highest in total of all centres.</p>",
+
+                    solution_hi: "<p>4.(d)<br>2018 में अनुपस्थितों की संख्या = (64 + 65 + 65) - (60 + 45 + 55) = 34<br>2017 में अनुपस्थितों की संख्या = (50 + 75 + 45) - (45 + 55 + 40) = 30 <br>2020 में अनुपस्थितों की संख्या= (55 + 80 + 90) - (44 + 66 + 85) = 30<br>2019 में अनुपस्थितों की संख्या= (80 + 84 + 70) - (69 + 72 + 62) = 31<br>उपरोक्त अभिव्यक्ति से यह स्पष्ट है कि 2019 में अनुपस्थितों की संख्या सभी केंद्रों के कुल योग में दूसरी सबसे अधिक है।</p>",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "5",
+
+                    section: "17",
+
+                    question_en: "5. Which of the following can be the value of ‘k’ so that the number 217924k is divisible by 6?",
+
+                    question_hi: "5. निम्नलिखित में से कौन-सा \'k\' का मान हो सकता है जिससे कि संख्या 217924k, 6 से विभाज्य हो?",
+
+                    options_en: [" 4 ", " 6", 
+
+                                " 2 ", " 0"],
+
+                    options_hi: [" 4 ", " 6",
+
+                                " 2 ", " 0"],
+
+                    solution_en: "5.(c) A number is divisible by 6 if it is divisible by both 2 and 3:<br />Divisibility of 2 : A number is divisible by 2 if it is an even number,  <br />Divisibility of 3 : A number is divisible by 3 if the sum of all digits of that number is divisible by 3.<br />Now, 217924k <br /><math display=\"inline\"><mo>⇒</mo></math> 2 + 1 + 7 + 9 + 2 + 4 + k = 25 + k<br />The possible value of k can be 0, 2 , 4 , 6 , 8<br />But the sum of number must be multiple of 3 so the value of k will be 2",
+
+                    solution_hi: "5.(c) एक संख्या 6 से विभाज्य है यदि वह 2 और 3 दोनों से विभाज्य होगा । <br />2 की विभाज्यता: एक संख्या 2 से विभाज्य होती है यदि वह एक सम संख्या है।   <br />3 की विभाज्यता: एक संख्या 3 से विभाज्य होती है यदि उस संख्या के सभी अंकों का योग 3 से विभाज्य हो।<br />अब, 217924k <br /><math display=\"inline\"><mo>⇒</mo></math> 2 + 1 + 7 + 9 + 2 + 4 + k = 25 + k<br />K का संभावित मान = 0, 2, 4, 6, 8 <br />लेकिन संख्या का योग 3 का गुणज होना चाहिए इसलिए k का मान 2 होगा। ",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "6",
+
+                    section: "17",
+
+                    question_en: "<p>6. Read the given information and answer the question that follows.<br>The following table gives the percentage of marks obtained by seven students in six different subjects in an examination.<br>The number in the brackets give the maximum marks in each subject.<br><strong id=\"docs-internal-guid-d89e7c9f-7fff-1222-4122-c720237f0fbe\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXfek-boxYjfyZKU9kEAop1Mo_0DXgUOBIwrNzDjbfiHC0SRkjLFUykeGRL_j3LPFf_pgz2N5MVo8dp_8Vr2_VhX_nxmJw99_9iwQiIRyuAvY7eviYuvw15qyRQCTpoCfkl2DcftrrWxgYBVxj7aCFuRvt8-?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"514\" height=\"185\"></strong><br>If someone secured all the highest scores that have been obtained by some student or the other in the six subjects as given in the table above, what would be the exact overall percentage score obtained by that student?</p>",
+
+                    question_hi: "<p>6. दी गई जानकारी को ध्यानपूर्वक पढ़ें और आगे दिए गए प्रश्न का उत्तर दें।<br>नीचे दी गई तालिका में एक परीक्षा के छह अलग-अलग विषयों में सात विद्यार्थियों द्वारा प्राप्त अंकों का प्रतिशत दर्शाया गया है।<br>कोष्ठक में दी गई संख्या प्रत्येक विषय के अधिकतम अंक को दर्शाती है।<br><strong id=\"docs-internal-guid-29dce70d-7fff-ab6d-b450-569694980769\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXcXcQdUJhhOTAIdkVvovbOity4Beadckl4H1_G9y_X3ikPiPti96-I1S43HfAvy1xVYhsg6AQ5DcpiLv8_Ip3cYJIqkWZJr7eS4IQmrdBwfrkB4Kr0FU_nyyjOJy278cUIDZoZVxSdkoAm7mXUh3Nd20vW-?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"430\" height=\"216\"></strong><br>यदि किसी ने उपरोक्त तालिका में दिए गए छह विषयों में किसी भी विद्यार्थी या अन्य को प्राप्त अंकों की तुलना में उच्चतम अंक प्राप्त किए हैं, तो उस विद्यार्थी को प्राप्त कुल प्रतिशत अंक ज्ञात करें।</p>",
+
+                    options_en: ["<p>91 <math display=\"inline\"><mfrac><mrow><mn>1</mn></mrow><mrow><mn>6</mn></mrow></mfrac></math>%</p>", "<p>95.16 %</p>", 
+
+                                "<p>91<math display=\"inline\"><mi>%</mi></math></p>", "<p>90 <math display=\"inline\"><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac></math>%</p>"],
+
+                    options_hi: ["<p>91 <math display=\"inline\"><mfrac><mrow><mn>1</mn></mrow><mrow><mn>6</mn></mrow></mfrac></math>%</p>", "<p>95.16 %</p>",
+
+                                "<p>91<math display=\"inline\"><mi>%</mi></math></p>", "<p>90 <math display=\"inline\"><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac></math>%</p>"],
+
+                    solution_en: "<p>6.(a)<br>Highest marks in maths = 150 &times; <math display=\"inline\"><mfrac><mrow><mn>100</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 150<br>Highest marks in chemistry = 130 &times; <math display=\"inline\"><mfrac><mrow><mn>80</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 104<br>Highest marks in Physics = 120 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 108<br>Highest marks in Geography = 100 &times; <math display=\"inline\"><mfrac><mrow><mn>95</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 95<br>Highest marks in History = 60 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 54<br>Highest marks in Computer science = 40 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 36<br>Required percentage = <math display=\"inline\"><mfrac><mrow><mn>150</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>104</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>108</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>95</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>54</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>36</mn></mrow><mrow><mn>150</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>130</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>120</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>100</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>60</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>40</mn><mi>&#160;</mi></mrow></mfrac></math> &times; 100 <br>= <math display=\"inline\"><mfrac><mrow><mn>547</mn></mrow><mrow><mn>600</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>547</mn><mn>6</mn></mfrac></math>&nbsp;= 91<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>1</mn><mn>6</mn></mfrac></math>%</p>",
+
+                    solution_hi: "<p>6.(a)<br>गणित में उच्चतम अंक = 150 &times; <math display=\"inline\"><mfrac><mrow><mn>100</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 150<br>रसायन विज्ञान में उच्चतम अंक = 130 &times; <math display=\"inline\"><mfrac><mrow><mn>80</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 104<br>भौतिकी में उच्चतम अंक = 120 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 108<br>भूगोल में उच्चतम अंक = 100 &times; <math display=\"inline\"><mfrac><mrow><mn>95</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 95<br>इतिहास में उच्चतम अंक = 60 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 54<br>कंप्यूटर विज्ञान में उच्चतम अंक = 40 &times; <math display=\"inline\"><mfrac><mrow><mn>90</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 36<br>आवश्यक प्रतिशत = <math display=\"inline\"><mfrac><mrow><mn>150</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>104</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>108</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>95</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>54</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>36</mn></mrow><mrow><mn>150</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>130</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>120</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>100</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>60</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>40</mn><mi>&#160;</mi></mrow></mfrac></math> &times; 100 <br>= <math display=\"inline\"><mfrac><mrow><mn>547</mn></mrow><mrow><mn>600</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>547</mn><mn>6</mn></mfrac></math> = 91<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>1</mn><mn>6</mn></mfrac></math>%</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "7",
+
+                    section: "17",
+
+                    question_en: "<p>7. The value of sin<sup>2</sup>30&deg; - sin<sup>2</sup>40&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>55&deg; - sin<sup>2</sup>35&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>50&deg; + sin<sup>2</sup>60&deg; is:</p>",
+
+                    question_hi: "<p>7. sin<sup>2</sup>30&deg; - sin<sup>2</sup>40&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>55&deg; - sin<sup>2</sup>35&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>50&deg; + sin<sup>2</sup>60&deg; का मान ज्ञात कीजिए।</p>",
+
+                    options_en: ["<p>1</p>", "<p>2</p>", 
+
+                                "<p>4</p>", "<p>0</p>"],
+
+                    options_hi: ["<p>1</p>", "<p>2</p>",
+
+                                "<p>4</p>", "<p>0</p>"],
+
+                    solution_en: "<p>7.(d) sin<sup>2</sup>30&deg; - sin<sup>2</sup>40&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>55&deg; - sin<sup>2</sup>35&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>50&deg; + sin<sup>2</sup>60&deg;<br>= (sin<sup>2</sup>30&deg; + sin<sup>2</sup>60&deg;) - (sin<sup>2</sup>40&deg; + sin<sup>2</sup>50&deg;) + (sin<sup>2</sup>45&deg; + sin<sup>2</sup>45&deg;) - (sin<sup>2</sup>55&deg;+ sin<sup>2</sup>35&deg;)<br>= 1 - 1 + 1 - 1 (∵ sin<sup>2</sup>&theta; + sin<sup>2</sup>(90&deg; - &theta;) = 1)<br>= 0</p>",
+
+                    solution_hi: "<p>7.(d) sin<sup>2</sup>30&deg; - sin<sup>2</sup>40&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>55&deg; - sin<sup>2</sup>35&deg; + sin<sup>2</sup>45&deg; - sin<sup>2</sup>50&deg; + sin<sup>2</sup>60&deg;<br>= (sin<sup>2</sup>30&deg; + sin<sup>2</sup>60&deg;) - (sin<sup>2</sup>40&deg; + sin<sup>2</sup>50&deg;) + (sin<sup>2</sup>45&deg; + sin<sup>2</sup>45&deg;) - (sin<sup>2</sup>55&deg;+ sin<sup>2</sup>35&deg;)<br>= 1 - 1 + 1 - 1 (∵ sin<sup>2</sup>&theta; + sin<sup>2</sup>(90&deg; - &theta;) = 1)<br>= 0</p>",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "8",
+
+                    section: "17",
+
+                    question_en: "<p>8. The value of cos<sup>2</sup>29&deg; + cos<sup>2</sup>61&deg; is:</p>",
+
+                    question_hi: "<p>8. cos<sup>2</sup>29&deg; + cos<sup>2</sup>61&deg; का मान ज्ञात कीजिए।</p>",
+
+                    options_en: ["<p><math display=\"inline\"><mfrac><mrow><mi>&#160;</mi><mo>&#8730;</mo><mn>3</mn></mrow><mrow><mn>2</mn></mrow></mfrac></math></p>", "<p>2</p>", 
+
+                                "<p>1</p>", "<p>0</p>"],
+
+                    options_hi: ["<p><math display=\"inline\"><mfrac><mrow><mi>&#160;</mi><mo>&#8730;</mo><mn>3</mn></mrow><mrow><mn>2</mn></mrow></mfrac></math></p>", "<p>2</p>",
+
+                                "<p>1</p>", "<p>0</p>"],
+
+                    solution_en: "<p>8.(c) cos<sup>2</sup>29&deg; + cos<sup>2</sup>61&deg;<br>= cos<sup>2</sup>29&deg; + cos<sup>2</sup>(90&deg; - 29&deg;)<br>= cos<sup>2</sup>29&deg; + sin<sup>2</sup>29&deg;<br>= 1</p>",
+
+                    solution_hi: "<p>8.(c) cos<sup>2</sup>29&deg; + cos<sup>2</sup>61&deg;<br>= cos<sup>2</sup>29&deg; + cos<sup>2</sup>(90&deg; - 29&deg;)<br>= cos<sup>2</sup>29&deg; + sin<sup>2</sup>29&deg;<br>= 1</p>",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "9",
+
+                    section: "17",
+
+                    question_en: "<p>9. An article is marked at ₹550. If it is sold at a discount of 40%, then the selling price becomes 10% more than its cost price. What is the cost price (in ₹)?</p>",
+
+                    question_hi: "<p>9. एक वस्तु पर ₹550 अंकित है। यदि इसे 40% की छूट पर बेचा जाता है, तो विक्रय मूल्य इसके क्रय मूल्य से 10% अधिक हो जाता है। क्रय मूल्य (₹ में) ज्ञात करें।</p>",
+
+                    options_en: ["<p>220</p>", "<p>330</p>", 
+
+                                "<p>300</p>", "<p>200</p>"],
+
+                    options_hi: ["<p>220</p>", "<p>330</p>",
+
+                                "<p>300</p>", "<p>200</p>"],
+
+                    solution_en: "<p>9.(c) Let the CP of an article be 100 units <br><strong>Given:</strong> MP of an article = ₹ 550<br>SP of an article = 550 &times; <math display=\"inline\"><mfrac><mrow><mn>60</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 330<br>According to the question,<br>110 units = 330<br>100 units = <math display=\"inline\"><mfrac><mrow><mn>330</mn></mrow><mrow><mn>110</mn></mrow></mfrac></math> &times; 100 = ₹ 300</p>",
+
+                    solution_hi: "<p>9.(c) माना , वस्तु का क्र.मू. = 100 इकाई <br><strong>दिया गया है: </strong>एक वस्तु का अंकित मूल्य = ₹ 550<br>एक वस्तु का विक्रय मूल्य = 550 &times; <math display=\"inline\"><mfrac><mrow><mn>60</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 330<br>प्रश्न के अनुसार,<br>110 units = 330<br>100 units = <math display=\"inline\"><mfrac><mrow><mn>330</mn></mrow><mrow><mn>110</mn></mrow></mfrac></math> &times; 100 = ₹ 300</p>",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "10",
+
+                    section: "17",
+
+                    question_en: "<p>10. The given table shows the percentage of marks obtained by three students in three different subjects in an institute. (maximum marks are given in brackets)<br><strong id=\"docs-internal-guid-08167775-7fff-8bca-4459-d96f0f845550\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXfBty4Bd4tPzb0k3FzuUKvvHrmafFfwpAKUrClDG7HCPgnt7jVe2W1yh9Wt0xffytB5KjDjcrPl9xks99p-fhgV44Ln5Eaxnb-nTgNBMs2lqKH8fMbm_CZgJKcGq-u9XQE8RJE38g8Jern-BnQZoDpeX3nD?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"287\" height=\"99\"></strong><br>If in order to pass the exam, a minimum of 105 marks are needed in History, how many students pass in the exam?</p>",
+
+                    question_hi: "<p>10. दी गई तालिका में एक संस्थान में तीन अलग-अलग विषयों में तीन विद्यार्थियों द्वारा प्राप्त अंकों का प्रतिशत दर्शाया गया है।<br><strong id=\"docs-internal-guid-1ea744fe-7fff-b01d-18c0-86916def43f1\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXdpI41SssYUd-77yVeWf-jos3Gjqzf66nQwboUEYVEcNzFQyv_ej5gqUo-WlohiKbiiQuXHHmElr31BXh8pL5ddgWH3VmqD361Q2InBO8AAlFHuzDotIkokmf5K08jUTAcSHDuWT9Dns7C012kE_AjdFBI?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"275\" height=\"118\"></strong><br>यदि परीक्षा उत्तीर्ण करने के लिए इतिहास में न्यूनतम 105 अंक चाहिए, तो कितने विद्यार्थी परीक्षा में उत्तीर्ण हुए हैं?</p>",
+
+                    options_en: ["<p>3</p>", "<p>1</p>", 
+
+                                "<p>0</p>", "<p>2</p>"],
+
+                    options_hi: ["<p>3</p>", "<p>1</p>",
+
+                                "<p>0</p>", "<p>2</p>"],
+
+                    solution_en: "<p>10.(b) According to the question,<br>Passing marks of Ram in History = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>54</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 94.5<br>Passing marks of Mohan in History = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>51</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 89.25<br>Passing marks of Shyam in History = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>75</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 131.25<br>Hence, only 1 student passed the examination.</p>",
+
+                    solution_hi: "<p>10.(b) प्रश्न के अनुसार,<br>इतिहास विषय में राम के उत्तीर्ण अंक = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>54</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 94.5<br>इतिहास विषय में मोहन के उत्तीर्ण अंक = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>51</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 89.25<br>इतिहास विषय में श्याम के उत्तीर्ण अंक = 175 &times; <math display=\"inline\"><mfrac><mrow><mn>75</mn></mrow><mrow><mn>100</mn></mrow></mfrac></math> = 131.25<br>अतः, केवल 1 छात्र परीक्षा में उत्तीर्ण हुआ।</p>",
+
+                    correct: "b",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "11",
+
+                    section: "17",
+
+                    question_en: "<p>11. Fill pipe P is 21 times faster than fill pipe Q. If Q can fill a cistern in 110 minutes, find the time it takes to fill the cistern when both fill pipes are opened together.</p>",
+
+                    question_hi: "<p>11. भरण पाइप P, भरण पाइप Q से 21 गुना तेज है। यदि Q एक टंकी को 110 मिनट में भर सकता है, तो दोनों भरण पाइपों को एक साथ खोलने पर टंकी को भरने में कितना समय लगेगा?</p>",
+
+                    options_en: ["<p>5 minutes</p>", "<p>4 minutes</p>", 
+
+                                "<p>3 minutes</p>", "<p>6 minutes</p>"],
+
+                    options_hi: ["<p>5 मिनट</p>", "<p>4 मिनट</p>",
+
+                                "<p>3 मिनट</p>", "<p>6 मिनट</p>"],
+
+                    solution_en: "<p>12.(a) <br>Ratio of pipe <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; P&nbsp; &nbsp; &nbsp;:&nbsp; &nbsp; &nbsp;Q<br>Time <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1&nbsp; &nbsp; &nbsp; :&nbsp; &nbsp; &nbsp;21<br>Efficiency <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; &nbsp; &nbsp; 21&nbsp; &nbsp; &nbsp;:&nbsp; &nbsp; &nbsp;1<br>Now,<br>Total time to fill the cistern = 110 &times; 1 = 110 units<br>Time taken by both pipe to fill the cistern = <math display=\"inline\"><mfrac><mrow><mn>110</mn></mrow><mrow><mn>22</mn></mrow></mfrac></math> = 5 minutes</p>",
+
+                    solution_hi: "<p>12.(a) <br>पाइप का अनुपात <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; &nbsp;P&nbsp; &nbsp; &nbsp;:&nbsp; &nbsp; &nbsp;Q<br>समय <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1&nbsp; &nbsp; &nbsp;:&nbsp; &nbsp; &nbsp;21<br>क्षमता <math display=\"inline\"><mo>&#8594;</mo></math>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 21&nbsp; &nbsp; &nbsp;:&nbsp; &nbsp; &nbsp;1<br>अब,<br>टंकी को भरने में लगा कुल समय = 110 &times; 1 = 110 इकाई<br>दोनों पाइपों द्वारा टंकी भरने में लगा समय = <math display=\"inline\"><mfrac><mrow><mn>110</mn></mrow><mrow><mn>22</mn></mrow></mfrac></math> = 5 मिनट</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "12",
+
+                    section: "17",
+
+                    question_en: "<p>12. The radii of the two cones are in the ratio of 2 : 5 and their volumes are in the ratio of 3 : 5. What is the ratio of their heights?</p>",
+
+                    question_hi: "<p>12. दो शंकुओं की त्रिज्&zwj;याओं का अनुपात 2 : 5 और उनके आयतन का अनुपात 3 : 5 है। इनकी ऊंचाइयों का अनुपात क्या है?</p>",
+
+                    options_en: ["<p>15 : 4</p>", "<p>11 : 15</p>", 
+
+                                "<p>13 : 11</p>", "<p>4 : 11</p>"],
+
+                    options_hi: ["<p>15 : 4</p>", "<p>11 : 15</p>",
+
+                                "<p>13 : 11</p>", "<p>4 : 11</p>"],
+
+                    solution_en: "<p>12.(a) Let the height of the two cone be <math display=\"inline\"><msub><mrow><mi>h</mi></mrow><mrow><mn>1</mn></mrow></msub></math> and h<sub>2</sub>, <br>According to the question,<br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mstyle displaystyle=\"true\"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><msubsup><mi>&#960;r</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub></mrow><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><msubsup><mi>&#960;r</mi><mn>2</mn><mn>2</mn></msubsup><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>3</mn><mn>5</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mn>4</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub></mrow><mrow><mn>25</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>3</mn><mn>5</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>75</mn><mn>20</mn></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>15</mn><mn>4</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> h<sub>1</sub> : h<sub>2</sub> = 15 : 4</p>",
+
+                    solution_hi: "<p>12.(a) माना कि दोनों शंकुओं की ऊंचाई <math display=\"inline\"><msub><mrow><mi>h</mi></mrow><mrow><mn>1</mn></mrow></msub></math>और h<sub>2</sub> है, <br>प्रश्न के अनुसार,<br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mstyle displaystyle=\"true\"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><msubsup><mi>&#960;r</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub></mrow><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><msubsup><mi>&#960;r</mi><mn>2</mn><mn>2</mn></msubsup><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>3</mn><mn>5</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mn>4</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub></mrow><mrow><mn>25</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>3</mn><mn>5</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><msub><mi mathvariant=\"normal\">h</mi><mn>1</mn></msub><msub><mi mathvariant=\"normal\">h</mi><mn>2</mn></msub></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>75</mn><mn>20</mn></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>15</mn><mn>4</mn></mfrac></math><br><math display=\"inline\"><mo>&#8658;</mo></math> h<sub>1</sub> : h<sub>2</sub> = 15 : 4</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "13",
+
+                    section: "17",
+
+                    question_en: "<p>13. Simplify<br><math display=\"inline\"><mfrac><mrow><mi>&#160;</mi><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>15</mn><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>+</mo><mi>&#160;</mi><mn>75</mn><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>125</mn></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>25</mn></mrow></mfrac></math>(x - 5)</p>",
+
+                    question_hi: "<p>13. सरल कीजिए :<br><math display=\"inline\"><mfrac><mrow><mi>&#160;</mi><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>15</mn><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>+</mo><mi>&#160;</mi><mn>75</mn><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>125</mn></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>25</mn></mrow></mfrac></math>(x - 5)</p>",
+
+                    options_en: ["<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 25</p>", "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 5x + 25</p>", 
+
+                                "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 10x + 25</p>", "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math>- 25</p>"],
+
+                    options_hi: ["<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 25</p>", "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 5x + 25</p>",
+
+                                "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 10x + 25</p>", "<p><math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math>- 25</p>"],
+
+                    solution_en: "<p>13.(c) <math display=\"inline\"><mfrac><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>15</mn><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>75</mn><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>125</mn></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>25</mn><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><msup><mrow><mn>5</mn></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mi>x</mi><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>5</mn><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><msup><mrow><mn>5</mn></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><mn>3</mn></mrow></msup></mrow><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><msup><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></math><br>= <math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 25 + 10x or x<sup>2</sup> + 10x + 25</p>",
+
+                    solution_hi: "<p>13.(c) <math display=\"inline\"><mfrac><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>15</mn><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>75</mn><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>125</mn></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>25</mn><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><msup><mrow><mn>5</mn></mrow><mrow><mn>3</mn></mrow></msup><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mi>x</mi><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>5</mn><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><msup><mrow><mn>5</mn></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><mn>3</mn></mrow></msup></mrow><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo><mi>&#160;</mi></mrow></mfrac></math> &times; (x - 5)<br>= <math display=\"inline\"><msup><mrow><mo>(</mo><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>5</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></math><br>= <math display=\"inline\"><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 25 + 10x or x<sup>2</sup> + 10x + 25</p>",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "14",
+
+                    section: "17",
+
+                    question_en: "<p>14. Which of the following can be the value of k, if <math display=\"inline\"><mfrac><mrow><mo>(</mo><mn>88</mn><mi>&#160;</mi><mo>&#247;</mo><mi>&#160;</mi><mn>8</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mi>k</mi><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>3</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>3</mn><mo>)</mo></mrow><mrow><msup><mrow><mo>(</mo><mn>6</mn></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>7</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>5</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><msup><mrow><mi>k</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>)</mo></mrow></mfrac></math> = 1 ?</p>",
+
+                    question_hi: "<p>14. यदि <math display=\"inline\"><mfrac><mrow><mo>(</mo><mn>88</mn><mi>&#160;</mi><mo>&#247;</mo><mi>&#160;</mi><mn>8</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mi>k</mi><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>3</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>3</mn><mo>)</mo></mrow><mrow><msup><mrow><mo>(</mo><mn>6</mn></mrow><mrow><mn>2</mn></mrow></msup><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>7</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>5</mn><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><msup><mrow><mi>k</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>)</mo></mrow></mfrac></math> = 1 है तो निम्नलिखित में से k का मान क्या हो सकता है?</p>",
+
+                    options_en: ["<p>1, 10</p>", "<p>4, 7</p>", 
+
+                                "<p>3, 10</p>", "<p>2, 7</p>"],
+
+                    options_hi: ["<p>1, 10</p>", "<p>4, 7</p>",
+
+                                "<p>3, 10</p>", "<p>2, 7</p>"],
+
+                    solution_en: "<p>14.(a) <math display=\"inline\"><mfrac><mrow><mn>88</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#247;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>8</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mi mathvariant=\"bold-italic\">k</mi><mi mathvariant=\"bold-italic\">&#160;</mi><mo>-</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>3</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>3</mn></mrow><mrow><msup><mrow><mn>6</mn></mrow><mrow><mn>2</mn></mrow></msup><mi mathvariant=\"bold-italic\">&#160;</mi><mo>-</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>7</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>5</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>+</mo><mi mathvariant=\"bold-italic\">&#160;</mi><msup><mrow><mi mathvariant=\"bold-italic\">k</mi></mrow><mrow><mn>2</mn></mrow></msup></mrow></mfrac></math> = 1<br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mn>11</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><mi>k</mi><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>9</mn></mrow><mrow><mn>36</mn><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>35</mn><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><msup><mi>k</mi><mn>2</mn></msup></mrow></mfrac></math> = 1<br><math display=\"inline\"><mo>&#8658;</mo></math> 11k - 9 = 1 + k<sup>2</sup><br><math display=\"inline\"><mo>&#8658;</mo></math> k<sup>2</sup> - 11k + 10 = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k<sup>2</sup> - 10k - k + 10 = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k(k - 10) - 1(k - 10) = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> (k - 10)(k - 1) = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k = 10 and 1</p>",
+
+                    solution_hi: "<p>14.(a) <math display=\"inline\"><mfrac><mrow><mn>88</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#247;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>8</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mi mathvariant=\"bold-italic\">k</mi><mi mathvariant=\"bold-italic\">&#160;</mi><mo>-</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>3</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>3</mn></mrow><mrow><msup><mrow><mn>6</mn></mrow><mrow><mn>2</mn></mrow></msup><mi mathvariant=\"bold-italic\">&#160;</mi><mo>-</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>7</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"bold-italic\">&#160;</mi><mn>5</mn><mi mathvariant=\"bold-italic\">&#160;</mi><mo>+</mo><mi mathvariant=\"bold-italic\">&#160;</mi><msup><mrow><mi mathvariant=\"bold-italic\">k</mi></mrow><mrow><mn>2</mn></mrow></msup></mrow></mfrac></math> = 1<br><math display=\"inline\"><mo>&#8658;</mo></math> <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mn>11</mn><mo>&#160;</mo><mo>&#215;</mo><mo>&#160;</mo><mi>k</mi><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>9</mn></mrow><mrow><mn>36</mn><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>35</mn><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><msup><mi>k</mi><mn>2</mn></msup></mrow></mfrac></math> = 1<br><math display=\"inline\"><mo>&#8658;</mo></math> 11k - 9 = 1 + k<sup>2</sup><br><math display=\"inline\"><mo>&#8658;</mo></math> k<sup>2</sup> - 11k + 10 = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k<sup>2</sup> - 10k - k + 10 = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k(k - 10) - 1(k - 10) = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> (k - 10)(k - 1) = 0<br><math display=\"inline\"><mo>&#8658;</mo></math> k = 10 and 1</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "15",
+
+                    section: "17",
+
+                    question_en: "<p>15. Let O be the centre of the circle and AB and CD are two parallel chords on the same side of the radius. OP is perpendicular to AB and OQ is perpendicular to CD. If AB = 10 cm, CD = 24 cm and PQ = 7 cm, then the diameter (in cm) of the circle is equal to:</p>",
+
+                    question_hi: "<p>15. मान लीजिए कि, O वृत्त का केंद्र है और AB और CD, त्रिज्या की समान भुजा पर दो समानांतर जीवाएं हैं। OP, AB के लंबवत है और OQ, CD के लंबवत है। यदि AB = 10 cm है, CD = 24 cm और PQ = 7 cm है, तो वृत्त का व्यास (cm में) _______ होगा।</p>",
+
+                    options_en: ["<p>26</p>", "<p>13</p>", 
+
+                                "<p>12</p>", "<p>24</p>"],
+
+                    options_hi: ["<p>26</p>", "<p>13</p>",
+
+                                "<p>12</p>", "<p>24</p>"],
+
+                    solution_en: "<p>15.(a)<br><strong id=\"docs-internal-guid-322c4c39-7fff-a402-6405-f65551c33329\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXc-m9-jYPO0N3DRrcu2tZbNCrzj9tGanXX8BtNeQguRnjoyIYskjOL64AU_acMbFTn1hijgWDgdojccKG-WphysqnpEIquDHGffjaeL0BoGu-DBzyM4QqrUhgkZ0H3gcH8KxllaPevk-w7ewvG_ShbcX3tq?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"153\" height=\"139\"></strong><br>In <math display=\"inline\"><mi>&#916;</mi></math>OQC, <br>By using pythagoras theorem,<br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + CQ<sup>2</sup> = OC<sup>2</sup><br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = OC<sup>2</sup> &hellip;&hellip;.(i)<br>In <math display=\"inline\"><mi>&#916;</mi></math>OPA, <br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>P</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + AP<sup>2</sup> = OA<sup>2</sup><br><math display=\"inline\"><msup><mrow><mo>(</mo><mi>O</mi><mi>Q</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>7</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></math> + 5<sup>2</sup> = OA<sup>2</sup> &hellip;&hellip;.(ii)<br>Equating the equation (i) and (ii) because OC = OA (radii of the circle)<br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = (OQ + 7)<sup>2</sup> + 5<sup>2</sup><br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 144 = OQ<sup>2</sup> + 49 + 14OQ + 25<br>144 - (49 + 25) = 14OQ<br>70 = 14OQ<br>OQ = 5 cm<br>Put the value of OQ in equation (i)<br><math display=\"inline\"><msup><mrow><mn>5</mn></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = OC<sup>2</sup><br><math display=\"inline\"><msup><mrow><msup><mrow><mi>O</mi><mi>C</mi></mrow><mrow><mn>2</mn></mrow></msup></mrow><mrow><mi>&#160;</mi></mrow></msup></math> = 25 + 144 = 169<br>OC = 13<br>So, the diameter of the circle = 2 &times; 13 = 26 cm</p>",
+
+                    solution_hi: "<p>15.(a)<br><strong id=\"docs-internal-guid-322c4c39-7fff-a402-6405-f65551c33329\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXc-m9-jYPO0N3DRrcu2tZbNCrzj9tGanXX8BtNeQguRnjoyIYskjOL64AU_acMbFTn1hijgWDgdojccKG-WphysqnpEIquDHGffjaeL0BoGu-DBzyM4QqrUhgkZ0H3gcH8KxllaPevk-w7ewvG_ShbcX3tq?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"153\" height=\"139\"></strong><br>In <math display=\"inline\"><mi>&#916;</mi></math>OQC, <br>पाइथागोरस प्रमेय का उपयोग करके,<br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + CQ<sup>2</sup> = OC<sup>2</sup><br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = OC<sup>2</sup> &hellip;&hellip;.(i)<br>In <math display=\"inline\"><mi>&#916;</mi></math>OPA, <br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>P</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + AP<sup>2</sup> = OA<sup>2</sup><br><math display=\"inline\"><msup><mrow><mo>(</mo><mi>O</mi><mi>Q</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>7</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></math> + 5<sup>2</sup> = OA<sup>2</sup> &hellip;&hellip;.(ii)<br>समीकरण (i) और (ii) को बराबर होगा क्योंकि OC = OA (वृत्त की त्रिज्या)<br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = (OQ + 7)<sup>2</sup> + 5<sup>2</sup><br><math display=\"inline\"><msup><mrow><mi>O</mi><mi>Q</mi></mrow><mrow><mn>2</mn></mrow></msup></math> + 144 = OQ<sup>2</sup> + 49 + 14OQ + 25<br>144 - (49 + 25) = 14OQ<br>70 = 14OQ<br>OQ = 5 cm<br>OQ का मान समीकरण (i) में रखने पर <br><math display=\"inline\"><msup><mrow><mn>5</mn></mrow><mrow><mn>2</mn></mrow></msup></math> + 12<sup>2</sup> = OC<sup>2</sup><br><math display=\"inline\"><msup><mrow><msup><mrow><mi>O</mi><mi>C</mi></mrow><mrow><mn>2</mn></mrow></msup></mrow><mrow><mi>&#160;</mi></mrow></msup></math> = 25 + 144 = 169<br>OC = 13<br>अतः , वृत्त का व्यास = 2 &times; 13 = 26 cm</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "16",
+
+                    section: "17",
+
+                    question_en: "<p>16. If cosec &theta; = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>5</mn><mn>3</mn></mfrac></math>, then evaluate (sec<sup>2</sup>&theta; - 1) &times; cot<sup>2</sup>&theta; &times;(1 + cot<sup>2</sup>&theta;)</p>",
+
+                    question_hi: "<p>16.यदि cosec &theta; =&nbsp;<math display=\"inline\"><mfrac><mrow><mn>5</mn></mrow><mrow><mn>3</mn></mrow></mfrac></math> है , तो (sec<sup>2</sup>&theta; - 1) &times; cot<sup>2</sup>&theta; &times;(1 + cot<sup>2</sup>&theta;)&nbsp;का मान ज्ञात कीजिए</p>",
+
+                    options_en: ["<p><math display=\"inline\"><mfrac><mrow><mn>25</mn></mrow><mrow><mn>16</mn></mrow></mfrac></math></p>", "<p><math display=\"inline\"><mfrac><mrow><mn>9</mn></mrow><mrow><mn>16</mn></mrow></mfrac></math></p>", 
+
+                                "<p><math display=\"inline\"><mfrac><mrow><mn>25</mn></mrow><mrow><mn>9</mn></mrow></mfrac></math></p>", "<p><math display=\"inline\"><mfrac><mrow><mn>4</mn></mrow><mrow><mn>5</mn></mrow></mfrac></math></p>"],
+
+                    options_hi: ["<p><math display=\"inline\"><mfrac><mrow><mn>25</mn></mrow><mrow><mn>16</mn></mrow></mfrac></math></p>", "<p><math display=\"inline\"><mfrac><mrow><mn>9</mn></mrow><mrow><mn>16</mn></mrow></mfrac></math></p>",
+
+                                "<p><math display=\"inline\"><mfrac><mrow><mn>25</mn></mrow><mrow><mn>9</mn></mrow></mfrac></math></p>", "<p><math display=\"inline\"><mfrac><mrow><mn>4</mn></mrow><mrow><mn>5</mn></mrow></mfrac></math></p>"],
+
+                    solution_en: "<p>16.(c) <strong>Given</strong> : cosec &theta; = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>5</mn><mn>3</mn></mfrac></math> <br><math display=\"inline\"><mo>&#8658;</mo></math>(sec<sup>2</sup>&theta; - 1) &times; cot<sup>2</sup>&theta; &times; (1 + cot<sup>2</sup>&theta;)<br>We know,<br><math display=\"inline\"><msup><mrow><mi>s</mi><mi>e</mi><mi>c</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> = 1 + tan<sup>2</sup>&theta;, cosec<sup>2</sup>&theta; = 1 + cot<sup>2</sup>&theta; and tan<sup>2</sup>&theta; &times; cot<sup>2</sup>&theta; = 1<br>Then, (1 + <math display=\"inline\"><msup><mrow><mi>t</mi><mi>a</mi><mi>n</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> - 1) &times; cot<sup>2</sup>&theta; &times; (cosec<sup>2</sup>&theta; )<br>= <math display=\"inline\"><msup><mrow><mi>t</mi><mi>a</mi><mi>n</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> &times; cot<sup>2</sup>&theta; &times; cosec<sup>2</sup>&theta;<br>= <math display=\"inline\"><msup><mrow><mi>c</mi><mi>o</mi><mi>s</mi><mi>e</mi><mi>c</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> = (<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>5</mn><mn>3</mn></mfrac></math>)<sup>2</sup> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>25</mn><mn>9</mn></mfrac></math></p>",
+
+                    solution_hi: "<p>16.(c) <strong>Given</strong> : cosec &theta; = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>5</mn><mn>3</mn></mfrac></math> <br><math display=\"inline\"><mo>&#8658;</mo></math>(sec<sup>2</sup>&theta; - 1) &times; cot<sup>2</sup>&theta; &times; (1 + cot<sup>2</sup>&theta;)<br>हम जानते हैं,<br><math display=\"inline\"><msup><mrow><mi>s</mi><mi>e</mi><mi>c</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> = 1 + tan<sup>2</sup>&theta;, cosec<sup>2</sup>&theta; = 1 + cot<sup>2</sup>&theta; and tan<sup>2</sup>&theta; &times; cot<sup>2</sup>&theta; = 1<br>Then, (1 + <math display=\"inline\"><msup><mrow><mi>t</mi><mi>a</mi><mi>n</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> - 1) &times; cot<sup>2</sup>&theta; &times; (cosec<sup>2</sup>&theta; )<br>= <math display=\"inline\"><msup><mrow><mi>t</mi><mi>a</mi><mi>n</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> &times; cot<sup>2</sup>&theta; &times; cosec<sup>2</sup>&theta;<br>= <math display=\"inline\"><msup><mrow><mi>c</mi><mi>o</mi><mi>s</mi><mi>e</mi><mi>c</mi></mrow><mrow><mn>2</mn></mrow></msup><mi>&#952;</mi></math> = (<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>5</mn><mn>3</mn></mfrac></math>)<sup>2</sup> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>25</mn><mn>9</mn></mfrac></math></p>",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "17",
+
+                    section: "17",
+
+                    question_en: "<p>17. The distance between the centres of two circles of radii 22 cm and 10 cm is 37 cm. If the points of contact of a direct common tangent to these circles are M and Q, then find the length of the line segment MQ.</p>",
+
+                    question_hi: "<p>17. 22 cm और 10 cm त्रिज्या वाले दो वृत्तों के केंद्रों के बीच की दूरी 37 cm है। यदि इन वृत्तों की सीधी उभयनिष्&zwj;ठ अनुस्पर्श रेखा के स्पर्श बिंदु (points of contact) M और Q हैं, तो रेखाखंड MQ की लंबाई ज्ञात कीजिए।</p>",
+
+                    options_en: ["<p>35 cm</p>", "<p>39 cm</p>", 
+
+                                "<p>29 cm</p>", "<p>25 cm</p>"],
+
+                    options_hi: ["<p>35 cm</p>", "<p>39 cm</p>",
+
+                                "<p>29 cm</p>", "<p>25 cm</p>"],
+
+                    solution_en: "<p>17.(a)<br><strong id=\"docs-internal-guid-2db5974c-7fff-47ba-097e-a8ca0742a6b2\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXd1BlWVPfmYzgPvsLfIkIGaYc2D1sqXvEAHdlU8jb0nUwPX7IUWApx3RFJ095FWcQcQyaVz94o5DFlZ_LdwGfRmtqEWp5_n6zN34Yc5bEzUKEmGGjNObffb4SD35nAIIGCEm8Qhwo5x2G0F_nhYh-Voa5Gh?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"213\" height=\"105\"></strong><br>Length of the common tangent(MQ) = <math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><msup><mrow><mo>(</mo><mi>distance</mi><mi mathvariant=\"normal\">&#160;</mi><mi>between</mi><mi mathvariant=\"normal\">&#160;</mi><mi>centre</mi><mi mathvariant=\"normal\">&#160;</mi><mi>of</mi><mi mathvariant=\"normal\">&#160;</mi><mi>two</mi><mi mathvariant=\"normal\">&#160;</mi><mi>circle</mi><mo>)</mo></mrow><mn>2</mn></msup><mo>-</mo><msup><mrow><mo>(</mo><msub><mi mathvariant=\"normal\">c</mi><mn>1</mn></msub><mi mathvariant=\"normal\">&#160;</mi><mo>+</mo><mi mathvariant=\"normal\">&#160;</mi><msub><mi mathvariant=\"normal\">c</mi><mn>2</mn></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><br>MQ = <math display=\"inline\"><msqrt><msup><mrow><mo>(</mo><mn>37</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><msup><mrow><mo>(</mo><mn>22</mn><mi>&#160;</mi><mo>-</mo><mn>10</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></msqrt></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><msup><mrow><mo>(</mo><mn>37</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><msup><mrow><mo>(</mo><mn>12</mn><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><br>MQ = <math display=\"inline\"><msqrt><mn>1369</mn><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>144</mn></msqrt></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><mn>1225</mn></msqrt></math> = 35 cm</p>",
+
+                    solution_hi: "<p>17.(a)<br><strong id=\"docs-internal-guid-0eae4897-7fff-02e0-78b4-357a4b59bbc0\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXd1BlWVPfmYzgPvsLfIkIGaYc2D1sqXvEAHdlU8jb0nUwPX7IUWApx3RFJ095FWcQcQyaVz94o5DFlZ_LdwGfRmtqEWp5_n6zN34Yc5bEzUKEmGGjNObffb4SD35nAIIGCEm8Qhwo5x2G0F_nhYh-Voa5Gh?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"213\" height=\"105\"></strong><br>उभयनिष्ठ स्पर्शरेखा की लंबाई(MQ) = <math style=\"font-family:Verdana\" display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><msup><mrow><mo>(</mo><mi>&#2342;&#2379;</mi><mo>&#160;</mo><mi>&#2357;&#2371;&#2340;&#2381;&#2340;</mi><mo>&#160;</mo><mi>&#2325;&#2375;</mi><mo>&#160;</mo><mi>&#2325;&#2375;&#2306;&#2342;&#2381;&#2352;</mi><mo>&#160;</mo><mi>&#2325;&#2375;</mi><mo>&#160;</mo><mi>&#2348;&#2368;&#2330;</mi><mo>&#160;</mo><mi>&#2325;&#2368;</mi><mo>&#160;</mo><mi>&#2342;&#2370;&#2352;&#2368;</mi><mo>)</mo></mrow><mn>2</mn></msup><mo>-</mo><msup><mrow><mo>(</mo><msub><mi mathvariant=\"normal\">c</mi><mn>1</mn></msub><mi mathvariant=\"normal\">&#160;</mi><mo>+</mo><mi mathvariant=\"normal\">&#160;</mi><msub><mi mathvariant=\"normal\">c</mi><mn>2</mn></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><br>MQ = <math display=\"inline\"><msqrt><msup><mrow><mo>(</mo><mn>37</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><msup><mrow><mo>(</mo><mn>22</mn><mi>&#160;</mi><mo>-</mo><mn>10</mn><mo>)</mo></mrow><mrow><mn>2</mn></mrow></msup></msqrt></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><msup><mrow><mo>(</mo><mn>37</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><msup><mrow><mo>(</mo><mn>12</mn><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><br>MQ = <math display=\"inline\"><msqrt><mn>1369</mn><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>144</mn></msqrt></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><msqrt><mn>1225</mn></msqrt></math> = 35 cm</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "18",
+
+                    section: "17",
+
+                    question_en: "<p>18. In a circular race of 840 m, A and B start running in the same direction at the same time from the same point at the speeds of 6 m/s and 12 m/s, respectively. After how much time will they meet next?</p>",
+
+                    question_hi: "<p>18. 840 m की एक वृत्ताकार दौड़ में A और B समान समय पर समान दिशा में समान बिंदु से क्रमशः 6 m/s और 12 m/s की चाल से दौड़ना आरम्भ करते हैं। वे अगली बार कितने समय बाद मिलेंगे?</p>",
+
+                    options_en: ["<p>140 s</p>", "<p>20 s</p>", 
+
+                                "<p>40 s</p>", "<p>70 s</p>"],
+
+                    options_hi: ["<p>140 s</p>", "<p>20 s</p>",
+
+                                "<p>40 s</p>", "<p>70 s</p>"],
+
+                    solution_en: "<p>18.(a) Distance of the circular track = 840 m<br>Relative speed = 12 - 6 = 6 m/s<br>Time (they will meet next time) = <math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mi>distance</mi><mi>speed</mi></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>840</mn><mn>6</mn></mfrac></math> = 140 sec.</p>",
+
+                    solution_hi: "<p>18.(a) वृत्ताकार ट्रैक की दूरी = 840 मीटर<br>सापेक्ष गति = 12 - 6 = 6 मी/से<br>समय ( जब वे अगली बार मिलेंगे) = <math style=\"font-family:Verdana\" display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><mstyle displaystyle=\"true\"><mfrac><mi>&#2342;&#2370;&#2352;&#2368;</mi><mrow><mi>&#2330;&#2366;&#2354;</mi><mo>&#160;</mo></mrow></mfrac></mstyle></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>840</mn><mn>6</mn></mfrac></math>= 140 सेकंड।.</p>",
+
+                    correct: "a",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "19",
+
+                    section: "17",
+
+                    question_en: "19. R pays ₹100 to P with ₹5, ₹2 and ₹1 coins. The total number of coins used for paying are 40. What is the number of coins of denomination ₹5 in the payment? ",
+
+                    question_hi: "19. R, P को ₹5, ₹2 और ₹1 के सिक्कों के साथ ₹100 का भुगतान करता है। भुगतान के लिए उपयोग किए गए सिक्कों की कुल संख्या 40 है। भुगतान में ₹5 मूल्यवर्ग के सिक्कों की संख्या कितनी है?",
+
+                    options_en: [" 16", " 17", 
+
+                                " 18", " 13"],
+
+                    options_hi: [" 16", " 17",
+
+                                " 18", " 13"],
+
+                    solution_en: "19.(d) <br />Let ₹5, ₹2, ₹1 coins be <math display=\"inline\"><mi>x</mi><mo>,</mo><mi>&nbsp;</mi><mi>y</mi><mo>,</mo><mi>&nbsp;</mi><mi>z</mi></math> respectively.<br />According to question, <br /><math display=\"inline\"><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>z</mi></math> = 40   ….. (i)<br /><math display=\"inline\"><mn>5</mn><mi>x</mi><mi>&nbsp;</mi><mo>+</mo><mi>&nbsp;</mi><mn>2</mn><mi>y</mi><mo>+</mo><mi>z</mi></math> = 100 …  (ii)<br />On subtracting equation (i) from (ii) we get<br /><math display=\"inline\"><mn>4</mn><mi>x</mi></math> + y = 60<br />Now on satisf<math display=\"inline\"><mi>y</mi></math>ing the options we find that only option (d) gives positive value of y and no. of coins must be positive.<br />Hence, no. of  ₹5 coins = 13",
+
+                    solution_hi: "19.(d) <br />माना  ₹5, ₹2, ₹1  के सिक्के क्रमशः  <math display=\"inline\"><mi>x</mi><mo>,</mo><mi>&nbsp;</mi><mi>y</mi><mo>,</mo><mi>&nbsp;</mi><mi>z</mi></math> हैं।<br />प्रश्न के अनुसार, <br /><math display=\"inline\"><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>z</mi></math> = 40   ….. (i)<br /><math display=\"inline\"><mn>5</mn><mi>x</mi><mi>&nbsp;</mi><mo>+</mo><mi>&nbsp;</mi><mn>2</mn><mi>y</mi><mo>+</mo><mi>z</mi></math> = 100 …  (ii)<br />समीकरण (i) को (ii) से घटाने पर हमें प्राप्त होता है<br /><math display=\"inline\"><mn>4</mn><mi>x</mi></math> + y = 60<br />अब विकल्पों से संतुष्ट करने पर हम पाते हैं कि केवल विकल्प (d) <math display=\"inline\"><mi>y</mi></math> का सकारात्मक मान देता है  और सिक्कों का मान सकारात्मक होना चाहिए । <br />अत:, ₹5 के सिक्कों की संख्या = 13",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "20",
+
+                    section: "17",
+
+                    question_en: "<p>20. In an election between two candidates, y% of the voters did not vote. 10% of the votes cast were declared invalid, while all the valid votes were cast in favour of either of the two candidates. The candidate who got 59.375% of the valid votes cast was declared elected by 2484 votes. If the number of people eligible to vote in that election was 16,000, what is the value of y?</p>",
+
+                    question_hi: "<p>20. दो उम्मीदवारों के बीच हुए एक चुनाव में, y% मतदाताओं ने मत नहीं डाला। डाले गए मतों में से 10% मत अवैध घोषित कर दिए गए, जबकि सभी वैध मत दोनों उम्मीदवारों में से किसी एक के पक्ष में पड़े। जिस उम्मीदवार को कुल वैध मतों में से 59.375% मत मिले, उसे 2484 मतों से निर्वाचित घोषित किया गया। यदि उस चुनाव में मतदान करने के पात्र लोगों की संख्या 16,000 थी, तो y का मान ज्ञात करें।</p>",
+
+                    options_en: ["<p>7.2</p>", "<p>8.4</p>", 
+
+                                "<p>8</p>", "<p>7.5</p>"],
+
+                    options_hi: ["<p>7.2</p>", "<p>8.4</p>",
+
+                                "<p>8</p>", "<p>7.5</p>"],
+
+                    solution_en: "<p>20.(c) <br>59.375% =<math display=\"inline\"><mfrac><mrow><mn>19</mn></mrow><mrow><mn>32</mn></mrow></mfrac></math> <br>Valid vote difference between two candidate = 6 unit <br>according to question,<br>16000(1 - <math display=\"inline\"><mfrac><mrow><mi>y</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math>) &times; <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>9</mn><mn>10</mn></mfrac></math> &times; <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>6</mn><mn>32</mn></mfrac></math> = 2484<br>100 - y = 92 <br>Y = 8</p>",
+
+                    solution_hi: "<p>20.(c) <br>59.375% = <math display=\"inline\"><mfrac><mrow><mn>19</mn></mrow><mrow><mn>32</mn></mrow></mfrac></math> <br>दो उम्मीदवारो के बीच वैध मतो का अंतर = 6 इकाई <br>प्रश्न के अनुसार,<br>16000(1 - <math display=\"inline\"><mfrac><mrow><mi>y</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math>) &times; <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>9</mn><mn>10</mn></mfrac></math> &times; <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>6</mn><mn>32</mn></mfrac></math> = 2484<br>100 - y = 92 <br>Y = 8</p>",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "21",
+
+                    section: "17",
+
+                    question_en: "<p>21. Mohan borrows a sum of ₹4,22,092 at the rate of 20% per annum simple interest. At the end of the first year, he repays ₹21,679 towards the return of principal amount borrowed. If Mohan clears all pending dues at the end of the second year, including interest payment that accrued during the first year, how much does he pay (in ₹) at the end of the second year?</p>",
+
+                    question_hi: "<p>21. मोहन ने 20% वार्षिक साधारण ब्याज की दर से ₹4,22,092 की राशि उधार ली। प्रथम वर्ष की समाप्ति पर, वह उधार ली गई मूल राशि की वापसी के लिए ₹21,679 चुकाता है। यदि मोहन दूसरे वर्ष की समाप्ति पर सभी लंबित बकाया राशि का भुगतान करता है, जिसमें प्रथम वर्ष के दौरान अर्जित ब्याज भुगतान भी शामिल है, तो वह दूसरे वर्ष की समाप्ति पर कितना भुगतान (₹ में) करेगा ?</p>",
+
+                    options_en: ["<p>556367</p>", "<p>558380</p>", 
+
+                                "<p>561347</p>", "<p>564914</p>"],
+
+                    options_hi: ["<p>556367</p>", "<p>558380</p>",
+
+                                "<p>561347</p>", "<p>564914</p>"],
+
+                    solution_en: "<p>21.(d) SI = <math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mi>principal</mi><mi mathvariant=\"normal\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"normal\">&#160;</mi><mi>rate</mi><mi mathvariant=\"normal\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"normal\">&#160;</mi><mi>time</mi><mi mathvariant=\"normal\">&#160;</mi></mrow><mn>100</mn></mfrac></math><br>SI for first year = <math display=\"inline\"><mfrac><mrow><mn>422092</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>20</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>1</mn><mi>&#160;</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 84418.40<br>Remaining the amount after repays = 422092 - 21679 = ₹ 400413<br>SI for second year = <math display=\"inline\"><mfrac><mrow><mn>400413</mn><mi>&#160;</mi><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>20</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>1</mn><mi>&#160;</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 80082.60<br>Mohan total pay the amount end of the second years = 84418.40 + 400413 + 80082.60 = ₹ 564914</p>",
+
+                    solution_hi: "<p>21.(d) SI = <math style=\"font-family:Verdana\" display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mi>&#2350;&#2370;&#2354;&#2343;&#2344;</mi><mo>&#160;&#160;</mo><mo>&#215;</mo><mi mathvariant=\"normal\">&#160;</mi><mi>&#2342;&#2352;</mi><mi mathvariant=\"normal\">&#160;</mi><mo>&#215;</mo><mi mathvariant=\"normal\">&#160;</mi><mi>&#2360;&#2350;&#2351;</mi></mrow><mn>100</mn></mfrac></math><br>प्रथम वर्ष के लिए साधारण ब्याज = <math display=\"inline\"><mfrac><mrow><mn>422092</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>20</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>1</mn><mi>&#160;</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 84418.40<br>21679 रुपये चुकाने के बाद शेष राशि = 422092 - 21679 = ₹ 400413<br>दूसरे वर्ष के लिए साधारण ब्याज = <math display=\"inline\"><mfrac><mrow><mn>400413</mn><mi>&#160;</mi><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>20</mn><mi>&#160;</mi><mo>&#215;</mo><mi>&#160;</mi><mn>1</mn><mi>&#160;</mi></mrow><mrow><mn>100</mn></mrow></mfrac></math> = ₹ 80082.60<br>दूसरे वर्ष के अंत में मोहन को कुल भुगतान राशि = 84418.40 + 400413 + 80082.60 = ₹ 564914</p>",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "22",
+
+                    section: "17",
+
+                    question_en: "<p>22. Simplify <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>9</mn><mo>)</mo></mrow><mrow><mi>x</mi><mo>+</mo><mn>3</mn></mrow></mfrac></math></p>",
+
+                    question_hi: "<p>22. <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>9</mn><mo>)</mo></mrow><mrow><mi>x</mi><mo>+</mo><mn>3</mn></mrow></mfrac></math> का मान क्या होगा?</p>",
+
+                    options_en: ["<p>x + 3</p>", "<p>x - 3</p>", 
+
+                                "<p><math display=\"inline\"><msqrt><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>9</mn></msqrt></math></p>", "<p>x - 9</p>"],
+
+                    options_hi: ["<p>x + 3</p>", "<p>x - 3</p>",
+
+                                "<p><math display=\"inline\"><msqrt><msup><mrow><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mn>9</mn></msqrt></math></p>", "<p>x - 9</p>"],
+
+                    solution_en: "<p>22.(b) <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mi>&#160;</mi><mn>9</mn><mo>)</mo></mrow><mrow><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn></mrow></mfrac></math><br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mi>&#160;</mi><msup><mrow><mn>3</mn></mrow><mrow><mn>2</mn></mrow></msup><mo>)</mo></mrow><mrow><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo></mrow><mrow><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo></mrow></mfrac></math> = (x - 3)</p>",
+
+                    solution_hi: "<p>22.(b) <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mi>&#160;</mi><mn>9</mn><mo>)</mo></mrow><mrow><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn></mrow></mfrac></math><br>= <math display=\"inline\"><mfrac><mrow><msup><mrow><mo>(</mo><mi>x</mi></mrow><mrow><mn>2</mn></mrow></msup><mo>-</mo><mi>&#160;</mi><msup><mrow><mn>3</mn></mrow><mrow><mn>2</mn></mrow></msup><mo>)</mo></mrow><mrow><mi>x</mi><mi>&#160;</mi><mo>+</mo><mi>&#160;</mi><mn>3</mn></mrow></mfrac></math> = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mrow><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>-</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo></mrow><mrow><mo>(</mo><mi>x</mi><mo>&#160;</mo><mo>+</mo><mo>&#160;</mo><mn>3</mn><mo>)</mo></mrow></mfrac></math> = (x - 3)</p>",
+
+                    correct: "b",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "23",
+
+                    section: "17",
+
+                    question_en: "23. Rajesh, in his printing press, got an order to print some books, out of which he completed <math display=\"inline\"><mfrac><mrow><mn>17</mn></mrow><mrow><mn>27</mn></mrow></mfrac></math> of the order in 34 days. In how many days did he complete the entire order of printing?",
+
+                    question_hi: "23. राजेश को उसके प्रिंटिंग प्रेस में कुछ किताबें छापने का ऑर्डर मिला, जिसमें से उसने ऑर्डर के <math display=\"inline\"><mfrac><mrow><mn>17</mn></mrow><mrow><mn>27</mn></mrow></mfrac></math> को 34 दिनों में पूरा किया। उसने छपाई का पूरा ऑर्डर कितने दिनों में पूरा किया ?",
+
+                    options_en: [" 60  ", " 20", 
+
+                                " 54", " 56"],
+
+                    options_hi: [" 60  ", " 20",
+
+                                " 54", " 56"],
+
+                    solution_en: "23.(c) According to the question,<br /><math display=\"inline\"><mfrac><mrow><mn>17</mn></mrow><mrow><mn>27</mn></mrow></mfrac></math> units = 34 days<br />1 units = <math display=\"inline\"><mfrac><mrow><mn>34</mn><mi>&nbsp;</mi><mo>×</mo><mi>&nbsp;</mi><mn>27</mn></mrow><mrow><mn>17</mn></mrow></mfrac></math> = 54 days",
+
+                    solution_hi: "23.(c)  प्रश्न के अनुसार,<br /><math display=\"inline\"><mfrac><mrow><mn>17</mn></mrow><mrow><mn>27</mn></mrow></mfrac></math> इकाइयाँ  = 34 दिन<br />1 इकाई = <math display=\"inline\"><mfrac><mrow><mn>34</mn><mi>&nbsp;</mi><mo>×</mo><mi>&nbsp;</mi><mn>27</mn></mrow><mrow><mn>17</mn></mrow></mfrac></math> = 54 दिन",
+
+                    correct: "c",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "24",
+
+                    section: "17",
+
+                    question_en: "<p>24. A grocer professes to sell rice at the cost price, but uses a fake weight of 870 g for 1 kg. Find his profit percentage (correct to two decimal places).</p>",
+
+                    question_hi: "<p>24. एक पंसारी लागत मूल्य पर चावल बेचने का दावा करता है, लेकिन 1 kg के लिए 870 g के नकली वजन का उपयोग करता है। उसका लाभ प्रतिशत (दो दशमलव स्थानों तक सही) ज्ञात कीजिए।</p>",
+
+                    options_en: ["<p>15.11%</p>", "<p>14.94%</p>", 
+
+                                "<p>18.21%</p>", "<p>11.11%</p>"],
+
+                    options_hi: ["<p>15.11%</p>", "<p>14.94%</p>",
+
+                                "<p>18.21%</p>", "<p>11.11%</p>"],
+
+                    solution_en: "<p>24.(b) As per question,<br>original weight = 1000 g<br>New weight = 870 g<br>Required Profit % = <math display=\"inline\"><mfrac><mrow><mn>1000</mn><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>870</mn></mrow><mrow><mn>870</mn></mrow></mfrac></math> &times; 100 = 14.94 %</p>",
+
+                    solution_hi: "<p>24.(b) प्रश्न के अनुसार,<br>मूल वजन = 1000 ग्राम <br>नया वजन = 870 ग्राम<br>आवश्यक लाभ % = <math display=\"inline\"><mfrac><mrow><mn>1000</mn><mi>&#160;</mi><mo>-</mo><mi>&#160;</mi><mn>870</mn></mrow><mrow><mn>870</mn></mrow></mfrac></math> &times; 100 = 14.94 %</p>",
+
+                    correct: "b",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+                questions.push({
+
+                    id: "25",
+
+                    section: "misc",
+
+                    question_en: "<p>25. The following table shows the marks (out of 100) obtained by five students in five different subjects.<br><strong id=\"docs-internal-guid-a98a1519-7fff-b161-99d9-417845f252d4\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXcxLYHaz1ebSyI2UcVTpSB-0EzHUbe6b06mhAtGdWTPmaNMggOKf1ihf2wvj1JiaSluvrzstAXHwTT6Z5eQYvvD7_Csr_VQyd76IYR2MBcp1xEuQ2HNcxMyIq8ewQR-tG_s2hNaAlMjL4083FYOvnCmnODk?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"426\" height=\"124\"></strong><br>Who obtained 79% marks in all the subjects taken together?</p>",
+
+                    question_hi: "<p>25. निम्नलिखित तालिका पांच अलग-अलग विषयों में पांच छात्रों द्वारा प्राप्त अंक (100 में से) दर्शाती है।<br><strong id=\"docs-internal-guid-d54e2c8e-7fff-dc80-16d7-6cfaede0b183\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXeEjnv98hTcayarXI99lWehrmQncrBwx7Yv8UaaKQ9RIdk4-NED-t57rACcT_Cbu3cD2hOjDIs1g0lxm2mihhlB_s43tGcy0UFoPl1m0m6MK5sE0DD_PT6UH6YwypfQo8-QP-UBaYMe-ti5RnAIpz60hAF1?key=-9KIlnQahEdIWQEvTKG21Hze\" width=\"383\" height=\"154\"></strong><br>सभी विषयों को मिलाकर 79% अंक किसने प्राप्त किए?</p>",
+
+                    options_en: ["<p>Sumit</p>", "<p>Mohit</p>", 
+
+                                "<p>Rohit</p>", "<p>Tarun</p>"],
+
+                    options_hi: ["<p>सुमित</p>", "<p>मोहित</p>",
+
+                                "<p>रोहित</p>", "<p>तरुण</p>"],
+
+                    solution_en: "<p>25.(d) <br>Sumit obtained percentage = <math display=\"inline\"><mfrac><mrow><mn>90</mn><mo>+</mo><mn>88</mn><mo>+</mo><mn>78</mn><mo>+</mo><mn>82</mn><mo>+</mo><mn>68</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>406</mn><mn>5</mn></mfrac></math> = 81.2%<br>Mohit obtained percentage = <math display=\"inline\"><mfrac><mrow><mn>73</mn><mo>+</mo><mn>84</mn><mo>+</mo><mn>77</mn><mo>+</mo><mn>90</mn><mo>+</mo><mn>95</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>419</mn><mn>5</mn></mfrac></math> = 83.8%<br>Rohit obtained percentage = <math display=\"inline\"><mfrac><mrow><mn>69</mn><mo>+</mo><mn>76</mn><mo>+</mo><mn>80</mn><mo>+</mo><mn>88</mn><mo>+</mo><mn>94</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>407</mn><mn>5</mn></mfrac></math> = 81.4%<br>Tarun obtained percentage = <math display=\"inline\"><mfrac><mrow><mn>65</mn><mo>+</mo><mn>80</mn><mo>+</mo><mn>75</mn><mo>+</mo><mn>85</mn><mo>+</mo><mn>90</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>395</mn><mn>5</mn></mfrac></math> = 79%<br>Hence, Tarun has obtained 79% marks in all the subjects</p>",
+
+                    solution_hi: "<p>25.(d) <br>सुमित को प्राप्त प्रतिशत = <math display=\"inline\"><mfrac><mrow><mn>90</mn><mo>+</mo><mn>88</mn><mo>+</mo><mn>78</mn><mo>+</mo><mn>82</mn><mo>+</mo><mn>68</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>406</mn><mn>5</mn></mfrac></math> = 81.2%<br>मोहित को प्राप्त प्रतिशत = <math display=\"inline\"><mfrac><mrow><mn>73</mn><mo>+</mo><mn>84</mn><mo>+</mo><mn>77</mn><mo>+</mo><mn>90</mn><mo>+</mo><mn>95</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>419</mn><mn>5</mn></mfrac></math> = 83.8%<br>रोहित को प्राप्त प्रतिशत = <math display=\"inline\"><mfrac><mrow><mn>69</mn><mo>+</mo><mn>76</mn><mo>+</mo><mn>80</mn><mo>+</mo><mn>88</mn><mo>+</mo><mn>94</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>407</mn><mn>5</mn></mfrac></math> = 81.4%<br>तरुण को प्राप्त प्रतिशत = <math display=\"inline\"><mfrac><mrow><mn>65</mn><mo>+</mo><mn>80</mn><mo>+</mo><mn>75</mn><mo>+</mo><mn>85</mn><mo>+</mo><mn>90</mn></mrow><mrow><mn>500</mn></mrow></mfrac></math> &times; 100 = <math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac><mn>395</mn><mn>5</mn></mfrac></math> = 79%<br>अतः, तरुण ने सभी विषयों में 79% अंक प्राप्त किए हैं।</p>",
+
+                    correct: "d",
+
+                    pos_marks: 2.0,
+
+                    neg_marks: 0.5
+
+                });
+
+            
+
+            // Generate question boxes
+
+            const boxesContainer = document.getElementById('question-boxes');
+
+            questions.forEach((q, index) => {
+
+                const box = document.createElement('div');
+
+                box.className = 'q-box';
+
+                box.textContent = index + 1;
+
+                box.onclick = () => showQuestion(index);
+
+                box.id = `box-${index}`;
+
+                boxesContainer.appendChild(box);
+
+            });
+
+            
+
+            // Show first question
+
+            showQuestion(0);
+
+            updateProgress();
+
+        }
+
+        
+
+        // Show a specific question
+
+        
+
+        function formatContent(text) {
+
+            if (!text) return '';
+
+            return text.replace(/<img/g, '<img style="max-width:100%;height:auto;"');
+
+        }
+
+        
+
+        function showQuestion(index) {
+
+            if (index < 0 || index >= questions.length) return;
+
+            
+
+            currentQuestion = index;
+
+            const question = questions[index];
+
+            
+
+            // Update question counter
+
+            document.getElementById('question-counter').textContent = `Question ${index + 1} of ${questions.length}`;
+
+            
+
+            // Update question boxes
+
+            document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
+
+            document.getElementById(`box-${index}`).classList.add('current');
+
+            
+
+            // Generate question HTML
+
+            let html = `
+
+                <div class="question-card">
+
+                    <div class="question-text">
+
+                        <div class="en">${formatContent(question.question_en)}</div>
+
+                        <div class="hi" style="display:none">${formatContent(question.question_hi)} </div>
+
+                    </div>
+
+                    <div class="options" id="options-container">`;
+
+            
+
+            // Add options
+
+            ['a', 'b', 'c', 'd'].forEach((opt, i) => {
+
+                let optionClass = '';
+
+                let isCorrectAnswer = opt === question.correct;
+
+                let isUserAnswer = answers[question.id] === opt;
+
+                
+
+                // When reviewing, add appropriate classes
+
+                if (submitted) {
+
+                    if (isCorrectAnswer) {
+
+                        optionClass += ' correct-answer';
+
+                    } else if (isUserAnswer && !isCorrectAnswer) {
+
+                        optionClass += ' incorrect';
+
+                    }
+
+                }
+
+                
+
+                html += `
+
+                    <div class="option-item">
+
+                        <input class="option-input" type="radio" name="q${index}" 
+
+                            id="opt-${index}-${opt}" value="${opt}" 
+
+                            ${isUserAnswer ? 'checked' : ''}
+
+                            onclick="selectAnswer('${question.id}', '${opt}')">
+
+                       <label class="option-label${optionClass}" for="opt-${index}-${opt}">
+
+                            <div class="en">${question.options_en[i]}</div>
+
+                            <div class="hi" style="display:none">${question.options_hi[i]}</div>
+
+                        </label>
+
+                    </div>`;
+
+            });
+
+            
+
+            // Add solution if submitted
+
+            if (submitted) {
+
+                const isCorrect = answers[question.id] === question.correct;
+
+                const resultText = answers[question.id] ? (isCorrect ? 'Correct!' : 'Incorrect!') : 'Not attempted';
+
+                
+
+                html += `
+
+                    <div class="solution-container">
+
+                        <div class="solution-title">${resultText}</div>
+
+                        <div class="solution-text">
+
+                            <div class="en">${question.solution_en}</div>
+
+                            <div class="hi" style="display:none">${question.solution_hi}</div>
+
+                        </div>
+
+                    </div>`;
+
+            }
+
+            
+
+            html += `</div></div>`;
+
+            
+
+            document.getElementById('questions-container').innerHTML = html;
+
+            
+
+            // Apply language settings
+
+            applyLanguage();
+
+            
+
+            // If in mobile view, close the menu
+
+            if (window.innerWidth < 992) {
+
+                toggleNav(false);
+
+            }
+
+            
+
+            // Add review mode class if submitted
+
+            if (submitted) {
+
+                document.getElementById('options-container').classList.add('review-mode');
+
+            }
+
+        }
+
+        
+
+        // Apply current language
+
+        function applyLanguage() {
+
+            document.querySelectorAll(`.${currentLang}`).forEach(el => el.style.display = 'block');
+
+            document.querySelectorAll(`.${currentLang === 'en' ? 'hi' : 'en'}`).forEach(el => el.style.display = 'none');
+
+            
+
+            // Update language button text
+
+            document.getElementById('lang-text').textContent = currentLang === 'en' ? 'Hi' : 'En';
+
+        }
+
+        
+
+        // Select an answer
+
+        function selectAnswer(qId, option) {
+
+            if (submitted) return;
+
+            
+
+            answers[qId] = option;
+
+            updateProgress();
+
+            
+
+            // Mark question as attempted in the navigation
+
+            const index = questions.findIndex(q => q.id === qId);
+
+            if (index >= 0) {
+
+                const box = document.getElementById(`box-${index}`);
+
+                box.classList.add('attempted');
+
+                box.classList.remove('unattempted');
+
+            }
+
+        }
+
+        
+
+        // Navigate to previous/next question
+
+        function prevQuestion() { 
+
+            if (currentQuestion > 0) showQuestion(currentQuestion - 1); 
+
+        }
+
+        
+
+        function nextQuestion() { 
+
+            if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1); 
+
+        }
+
+        
+
+        // Switch section
+
+        function switchSection(sectionId) {
+
+            if (sectionId === 'all') {
+
+                showQuestion(0);
+
+                return;
+
+            }
+
+            
+
+            const section = sections[sectionId];
+
+            if (section) showQuestion(section.start);
+
+        }
+
+        
+
+        // Toggle language
+
+        function toggleLanguage() {
+
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+
+            applyLanguage();
+
+        }
+
+        
+
+        // Toggle navigation sidebar
+
+        function toggleNav(show) {
+
+            const nav = document.getElementById('question-nav');
+
+            const overlay = document.getElementById('nav-overlay');
+
+            
+
+            if (show === undefined) {
+
+                show = !nav.classList.contains('show');
+
+            }
+
+            
+
+            if (show) {
+
+                nav.classList.add('show');
+
+                overlay.classList.add('show');
+
+                document.body.style.overflow = 'hidden';
+
+            } else {
+
+                nav.classList.remove('show');
+
+                overlay.classList.remove('show');
+
+                document.body.style.overflow = '';
+
+            }
+
+        }
+
+        
+
+        // Update progress
+
+        function updateProgress() {
+
+            const attempted = Object.keys(answers).length;
+
+            document.getElementById('attempted-count').textContent = attempted;
+
+        }
+
+        
+
+        // Start timer
+
+        function startTimer() {
+
+            const timerDisplay = document.getElementById('timer-display');
+
+            let timeLeft = totalTime;
+
+            
+
+            const timerInterval = setInterval(() => {
+
+                if (timeLeft <= 0 || submitted) {
+
+                    clearInterval(timerInterval);
+
+                    if (!submitted) submitTest();
+
+                    return;
+
+                }
+
+                
+
+                const minutes = Math.floor(timeLeft / 60);
+
+                const seconds = timeLeft % 60;
+
+                timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                timeLeft--;
+
+            }, 1000);
+
+        }
+
+        
+
+        // Confirm before submitting
+
+        function confirmSubmit() {
+
+            if (submitted) return;
+
+            
+
+            const attempted = Object.keys(answers).length;
+
+            const remaining = questions.length - attempted;
+
+            
+
+            // Create a more modern confirmation dialog
+
+            const confirmHtml = `
+
+                <div style="text-align: center; padding: 20px;">
+
+                    <h4 style="margin-bottom: 16px; color: var(--dark);">Confirm Submission</h4>
+
+                    <p style="margin-bottom: 24px; color: var(--gray);">
+
+                        You have attempted ${attempted} of ${questions.length} questions.<br>
+
+                        ${remaining} questions are unattempted.
+
+                    </p>
+
+                    <div style="display: flex; justify-content: center; gap: 12px;">
+
+                        <button onclick="this.closest('.modal').querySelector('.cancel-btn').click()" 
+
+                            style="padding: 8px 20px; border: 1px solid var(--light-gray); background: white; border-radius: 8px; cursor: pointer;">
+
+                            Cancel
+
+                        </button>
+
+                        <button onclick="submitTest(); this.closest('.modal').querySelector('.cancel-btn').click()" 
+
+                            style="padding: 8px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+
+                            Submit Test
+
+                        </button>
+
+                    </div>
+
+                </div>`;
+
+            
+
+            // Create modal element
+
+            const modal = document.createElement('div');
+
+            modal.className = 'results-modal show';
+
+            modal.innerHTML = `
+
+                <div class="results-card" style="max-width: 400px;">
+
+                    <button class="cancel-btn" style="position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--gray);" onclick="this.closest('.results-modal').remove()">
+
+                        ×
+
+                    </button>
+
+                    ${confirmHtml}
+
+                </div>`;
+
+            
+
+            document.body.appendChild(modal);
+
+        }
+
+        
+
+        // Submit test
+
+        function submitTest() {
+
+            if (submitted) return;
+
+            
+
+            submitted = true;
+
+            
+
+            let score = 0;
+
+            let correctCount = 0;
+
+            let incorrectCount = 0;
+
+            let unattemptedCount = 0;
+
+            
+
+            questions.forEach((q, index) => {
+
+                const userAns = answers[q.id];
+
+                const box = document.getElementById(`box-${index}`);
+
+                
+
+                box.classList.remove('attempted');
+
+                
+
+                if (!userAns) {
+
+                    unattemptedCount++;
+
+                    box.classList.add('unattempted');
+
+                } else if (userAns === q.correct) {
+
+                    correctCount++;
+
+                    score += q.pos_marks;
+
+                    box.classList.add('correct');
+
+                } else {
+
+                    incorrectCount++;
+
+                    score -= q.neg_marks;
+
+                    box.classList.add('incorrect');
+
+                }
+
+            });
+
+            
+
+            // Update result values
+
+            document.getElementById('score-value').textContent = score.toFixed(2);
+
+            document.getElementById('correct-value').textContent = correctCount;
+
+            document.getElementById('incorrect-value').textContent = incorrectCount;
+
+            document.getElementById('unattempted-value').textContent = unattemptedCount;
+
+            
+
+            // Show the results modal
+
+            document.getElementById('results-modal').classList.add('show');
+
+            
+
+            // Disable submit button
+
+            const submitBtn = document.getElementById('submit-btn');
+
+            submitBtn.disabled = true;
+
+            submitBtn.innerHTML = '<i class="fas fa-check"></i>';
+
+            submitBtn.style.backgroundColor = 'var(--success)';
+
+            
+
+            // Refresh current question view to show solution
+
+            showQuestion(currentQuestion);
+
+        }
+
+        
+
+        // Review test
+
+        function reviewTest() {
+
+            document.getElementById('results-modal').classList.remove('show');
+
+            showQuestion(0);
+
+        }
+
+        
+
+        // Close modal when clicking outside
+
+        window.addEventListener('click', function(event) {
+
+            if (event.target === document.getElementById('results-modal')) {
+
+                document.getElementById('results-modal').classList.remove('show');
+
+            }
+
+        });
+
+        
+
+        // Keyboard navigation
+
+        document.addEventListener('keydown', function(e) {
+
+            if (e.key === 'ArrowLeft') prevQuestion();
+
+            if (e.key === 'ArrowRight') nextQuestion();
+
+        });
+
+    </script>
+
+</body>
+
+</html>
