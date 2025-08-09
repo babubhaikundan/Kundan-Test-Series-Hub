@@ -24,7 +24,7 @@
             <div class="welcome-icon"><i class="fas fa-brain"></i></div>
             <h3 id="welcome-title">Loading Test...</h3>
             <div class="welcome-branding">
-                <a href="https://t.me/kundan_yadav_bot" target="_blank">By: <span class="kundan-font">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</span></a>
+                <a href="https://t.me/kundan_yadav_bot" target="_blank">Developer💀: <span class="kundan-font">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</span></a>
             </div>
             <div class="welcome-stats">
                 <div class="stat-item">
@@ -474,10 +474,8 @@
                 y += 20;
                 pdf.setFont('Helvetica', 'normal');
                 pdf.setFontSize(12);
-                pdf.text(`By: ${userName || 'Kundan Yadav'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
+                pdf.text(`Developer💀: ${'<a href="https://t.me/kundan_yadav_bot" target="_blank">Contact📞- 𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</a>'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
                 y += 15;
-                pdf.text(`Mobile: ${userMobile || 'N/A'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
-                y += 20;
                 pdf.setLineWidth(1.5);
                 pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
                 y += 30;
