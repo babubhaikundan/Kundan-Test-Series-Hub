@@ -475,9 +475,9 @@
                 pdf.setFont('Helvetica', 'normal');
                 pdf.setFontSize(12);
                 // Clickable link add karo
-pdf.textWithLink('Contact📞- 𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎', 60, 30, {
-  url: 'https://t.me/kundan_yadav_bot'
-}), pdf.internal.pageSize.width / 2, y, { align: 'center' });
+pdf.text(`Mobile: ${userMobile || 'N/A'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
+                y += 20;
+                pdf.internal.pageSize.width / 2, y, { align: 'center' });
                 y += 15;
                 pdf.setLineWidth(1.5);
                 pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
