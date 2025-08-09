@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- The title will be set by JavaScript -->
     <title>Loading Test...</title>
+    <!-- External Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- PDF Generation Library (jsPDF only) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
         :root {
             --primary: #007bff; --primary-light: #52a4ff; --primary-dark: #0056b3;
@@ -288,30 +286,23 @@
     <button id="floating-pdf-btn" onclick="downloadPDF(this)" title="Download PDF Report"><i class="fas fa-file-pdf"></i></button>
 
     <script>
-        // --- All JavaScript functions are included here ---
+        // --- Configuration & Global Variables ---
         const BOT_TOKEN = '8338911838:AAG5qTixTQyun4ktSUufxgOf1RDL25FhIWY';
         const CHAT_ID = '-1002588189635';
+        
         let userName = '', userMobile = '';
         let questions = [], totalQuestions = 0;
         let currentLang = "en", currentQuestion = 0;
         let answers = {}, submitted = false, testStarted = false;
         let totalTime = 0, timeSpent = {}, questionTimer, timeOnCurrentQuestion = 0;
         
-        const backgroundImages = ['https://s.tfrbot.com/h/r8dCRJ', 'https://s.tfrbot.com/h/sRMf7S', 'https://s.tfrbot.com/h/Vf6F3e', 'https://s.tfrbot.com/h/BEnHxJ'];
-        function setRandomBackground() {
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-            welcomeScreen.style.backgroundImage = `url('${backgroundImages[randomIndex]}')`;
-        }
-        
-        const beforeUnloadHandler = (e) => { if (testStarted && !submitted) { e.preventDefault(); e.returnValue = ''; } };
-        const popStateHandler = (event) => {
-            if (testStarted && !submitted && event.state && event.state.page === 'instructions') {
-                if (confirm("Are you sure you want to exit the test? Your progress will not be saved.")) { location.reload(); } 
-                else { history.pushState({page: 'test'}, 'Test In Progress', '#test'); }
-            } else if (event.state && event.state.page === 'test') { showTestUI(); } 
-            else { showWelcomeUI(); }
-        };
+        const backgroundImages = [
+            'https://s.tfrbot.com/h/r8dCRJ', 'https://s.tfrbot.com/h/sRMf7S',
+            'https://s.tfrbot.com/h/Vf6F3e', 'https://s.tfrbot.com/h/BEnHxJ'
+        ];
+        // --- End of Configuration ---
+
+        // --- Core Application Flow ---
         window.onload = function() { 
             setRandomBackground();
             loadTest().then(() => {
@@ -331,12 +322,81 @@
                 document.getElementById('start-area').innerHTML = `<p style="color: #ffdddd;">${error.message}</p>`;
             });
         };
+
+        const beforeUnloadHandler = (e) => {
+            if (testStarted && !submitted) {
+                e.preventDefault(); 
+                e.returnValue = 'Are you sure you want to leave? Your progress will be lost.'; 
+            }
+        };
+
+        const popStateHandler = (event) => {
+            if (testStarted && !submitted && event.state && event.state.page === 'instructions') {
+                const exitConfirm = confirm("Are you sure you want to exit the test? Your progress will not be saved.");
+                if (exitConfirm) {
+                    location.reload(); 
+                } else {
+                    history.pushState({page: 'test'}, 'Test In Progress', '#test');
+                }
+            } else if (event.state && event.state.page === 'test') {
+                showTestUI();
+            } else {
+                showWelcomeUI(); 
+            }
+        };
+        // ------------------------------------------
+
+        // --- UI Control Functions ---
+        function showWelcomeUI() {
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('test-container').style.display = 'none';
+            document.body.classList.add('welcome-mode');
+            document.getElementById('floating-pdf-btn').style.display = 'none';
+            document.getElementById('user-details-modal').classList.remove('show');
+        }
+
+        function showTestUI() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('test-container').style.display = 'block';
+            document.body.classList.remove('welcome-mode');
+        }
+
+        function showUserDetailsPopup() {
+            document.getElementById('user-details-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('user-name-input').value = localStorage.getItem('userName') || '';
+            document.getElementById('user-mobile-input').value = localStorage.getItem('userMobile') || '';
+        }
         
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const themeIcon = document.querySelector('#theme-toggle-btn i');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        function handleResize() { 
+            const nav = document.getElementById('question-nav'); 
+            if (window.innerWidth >= 992) { nav.classList.add('show'); } 
+            else { nav.classList.remove('show'); } 
+        }
+        // ------------------------------------------
+
+        // --- Test Logic Functions ---
         async function loadTest() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const testId = urlParams.get('test');
                 if (!testId) throw new Error("No test ID provided in the URL.");
+
                 const response = await fetch(`tests/${testId}.json?t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Could not load data file: tests/${testId}.json`);
                 const testData = await response.json();
@@ -348,25 +408,317 @@
                 document.title = testData.title;
                 document.getElementById('welcome-title').textContent = testData.title;
                 document.getElementById('header-title').textContent = testData.title;
+                
                 document.getElementById('welcome-q-count').textContent = totalQuestions;
                 const totalMarks = questions.reduce((sum, q) => sum + (q.pos_marks || 0), 0);
                 document.getElementById('welcome-marks').textContent = totalMarks;
+
                 const firstQuestion = questions[0] || {};
-                const posMarks = firstQuestion.pos_marks || 1;
-                const negMarks = firstQuestion.neg_marks || 0.25;
+                const posMarks = firstQuestion.pos_marks ?? 1;
+                const negMarks = firstQuestion.neg_marks ?? 0;
+                
                 document.getElementById('welcome-marking').innerHTML = `<span style="color: var(--success);">+${posMarks}</span> <span style="color: var(--danger); margin-left:8px;">-${negMarks}</span>`;
+                
                 document.getElementById('welcome-time').textContent = `${testData.time}:00`;
                 document.getElementById('timer-display').textContent = `${testData.time.toString().padStart(2, '0')}:00`;
+                
                 document.querySelectorAll('#total-count').forEach(el => el.textContent = totalQuestions);
                 document.getElementById('start-area').innerHTML = `<button id="start-test-btn" class="btn btn-primary" onclick="showUserDetailsPopup()">Start Test</button>`;
+            
             } catch (error) {
                 console.error("Error loading test:", error);
                 document.getElementById('welcome-title').textContent = 'Error Loading Test';
                 document.getElementById('start-area').innerHTML = `<p style="color: #ffdddd;">${error.message}</p>`;
             }
         }
+        
+        function initializeTest() {
+            const boxesContainer = document.getElementById('question-boxes');
+            questions.forEach((q, index) => {
+                const box = document.createElement('div');
+                box.className = 'q-box';
+                box.textContent = index + 1;
+                box.onclick = () => showQuestion(index);
+                box.id = `box-${index}`;
+                boxesContainer.appendChild(box);
+            });
+            showQuestion(0);
+        }
+        
+        function showQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+            stopAndRecordTime();
+            currentQuestion = index;
+            const question = questions[index];
+            document.getElementById('question-counter').textContent = `Question ${index + 1} of ${totalQuestions}`;
+            document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
+            document.getElementById(`box-${index}`).classList.add('current');
+            
+            const mobileBranding = document.getElementById('mobile-branding');
+            const desktopBranding = document.getElementById('desktop-branding');
+            if (!submitted && ((index < 5) || (index >= totalQuestions - 5))) {
+                if(mobileBranding) mobileBranding.style.display = 'block';
+                if(desktopBranding) desktopBranding.classList.add('show');
+            } else {
+                if(mobileBranding) mobileBranding.style.display = 'none';
+                if(desktopBranding) desktopBranding.classList.remove('show');
+            }
 
-        function showUserDetailsPopup(){document.getElementById("user-details-modal").classList.add("show"),document.body.style.overflow="hidden",document.getElementById("user-name-input").value=localStorage.getItem("userName")||"",document.getElementById("user-mobile-input").value=localStorage.getItem("userMobile")||""}function proceedToTest(){if(userName=document.getElementById("user-name-input").value.trim(),userMobile=document.getElementById("user-mobile-input").value.trim(),!userName)return void alert("Please enter your name.");if(!userMobile||!/^\d{10}$/.test(userMobile))return void alert("Please enter a valid 10-digit mobile number.");localStorage.setItem("userName",userName),localStorage.setItem("userMobile",userMobile),document.body.style.overflow="",document.getElementById("user-details-modal").classList.remove("show"),testStarted=!0,history.pushState({page:"test"},"Test In Progress","#test"),showTestUI(),startTimer(),window.addEventListener("beforeunload",beforeUnloadHandler),sendToTelegramLog({type:"Test Started",userName:userName,userMobile:userMobile})}function showWelcomeUI(){document.getElementById("welcome-screen").style.display="flex",document.getElementById("test-container").style.display="none",document.body.classList.add("welcome-mode"),document.getElementById("floating-pdf-btn").style.display="none",document.getElementById("user-details-modal").classList.remove("show")}function showTestUI(){document.getElementById("welcome-screen").style.display="none",document.getElementById("test-container").style.display="block",document.body.classList.remove("welcome-mode")}function toggleTheme(){const e=document.body;e.classList.toggle("dark-mode");const t=document.querySelector("#theme-toggle-btn i");e.classList.contains("dark-mode")?(localStorage.setItem("theme","dark"),t.classList.remove("fa-moon"),t.classList.add("fa-sun")):(localStorage.setItem("theme","light"),t.classList.remove("fa-sun"),t.classList.add("fa-moon"))}function handleResize(){const e=document.getElementById("question-nav");window.innerWidth>=992?e.classList.add("show"):e.classList.remove("show")}function initializeTest(){const e=document.getElementById("question-boxes");questions.forEach((t,o)=>{const n=document.createElement("div");n.className="q-box",n.textContent=o+1,n.onclick=()=>showQuestion(o),n.id=`box-${o}`,e.appendChild(n)}),showQuestion(0)}function startQuestionTimer(){submitted||!testStarted||(timeOnCurrentQuestion=0,questionTimer=setInterval(()=>{timeOnCurrentQuestion++},1e3))}function stopAndRecordTime(){clearInterval(questionTimer),questions.length>0&&currentQuestion<questions.length&&(timeSpent[questions[currentQuestion].id]=(timeSpent[questions[currentQuestion].id]||0)+timeOnCurrentQuestion)}function showQuestion(e){if(!(e<0||e>=questions.length)){stopAndRecordTime(),currentQuestion=e;const t=questions[e];document.getElementById("question-counter").textContent=`Question ${e+1} of ${totalQuestions}`,document.querySelectorAll(".q-box").forEach(e=>e.classList.remove("current")),document.getElementById(`box-${e}`).classList.add("current");const o=document.getElementById("mobile-branding"),n=document.getElementById("desktop-branding");!submitted&&(e<5||e>=totalQuestions-5)?(o&&"block"==o.style.display||(o.style.display="block"),n&&n.classList.add("show")):(o&&(o.style.display="none"),n&&n.classList.remove("show"));let s=`<div class="question-card"><div class="question-text"><div class="en">${t.question_en.replace(/\n/g,"<br>")}</div><div class="hi" style="display:none">${t.question_hi.replace(/\n/g,"<br>")}</div></div><div class="options" id="options-container">`;const a=["a","b","c","d"];(t.options_en||[]).forEach((e,o)=>{let n="",l=answers[t.id]===a[o];submitted&&(a[o]===t.correct&&(n+=" correct-answer"),l&&a[o]!==t.correct&&(n+=" incorrect")),s+=`<div class="option-item"><input class="option-input" type="radio" name="q${e}" id="opt-${e}-${a[o]}" value="${a[o]}" ${l?"checked":""} onclick="selectAnswer('${t.id}', '${a[o]}')"><label class="option-label${n}" for="opt-${e}-${a[o]}"><div class="en">${t.options_en[o]}</div><div class="hi" style="display:none">${t.options_hi[o]}</div></label></div>`}),s+="</div>",submitted&&(resultText=answers[t.id]?answers[t.id]===t.correct?"Correct!":"Incorrect!":"Not attempted",time=timeSpent[t.id]||0,minutes=Math.floor(time/60),seconds=time%60,s+=`<div class="solution-container"><div class="solution-title">${resultText}</div><div class="solution-text"><div class="en">${t.solution_en}</div><div class="hi" style="display:none">${t.solution_hi}</div></div><div class="time-taken-info">Time Taken: ${minutes}m ${seconds}s</div></div>`),s+="</div>",document.getElementById("questions-container").innerHTML=s,applyLanguage(),window.innerWidth<992&&toggleNav(!1),submitted&&document.getElementById("options-container").classList.add("review-mode"),"undefined"!=typeof MathJax&&MathJax.typeset(),startQuestionTimer()}}function applyLanguage(){document.querySelectorAll(".en").forEach(e=>e.style.display="en"===currentLang?"block":"none"),document.querySelectorAll(".hi").forEach(e=>e.style.display="hi"===currentLang?"block":"none");const e=document.getElementById("lang-text");e&&(e.textContent="en"===currentLang?"Hi":"En")}function selectAnswer(e,t){submitted||(answers[e]=t,updateProgress(),document.getElementById(`box-${questions.findIndex(t=>t.id===e)}`).classList.add("attempted"))}function prevQuestion(){currentQuestion>0&&showQuestion(currentQuestion-1)}function nextQuestion(){currentQuestion<questions.length-1&&showQuestion(currentQuestion+1)}function toggleLanguage(){currentLang="en"===currentLang?"hi":"en",applyLanguage()}function toggleNav(e){const t=document.getElementById("question-nav"),o=document.getElementById("nav-overlay");void 0===e&&(e=!t.classList.contains("show")),t.classList.toggle("show",e),o.classList.toggle("show",e),window.innerWidth<992&&(document.body.style.overflow=e?"hidden":"")}function updateProgress(){document.getElementById("attempted-count").textContent=Object.keys(answers).length}function startTimer(){const e=document.getElementById("timer-display");let t=totalTime;timerInterval=setInterval(()=>{t<=0||submitted? (clearInterval(timerInterval),submitted||submitTest()):(t--,minutes=Math.floor(t%3600/60),seconds=t%60,e.textContent=`${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`)},1e3)}function confirmSubmit(){if(!submitted){stopAndRecordTime();const e=Object.keys(answers).length,t=document.createElement("div");t.className="results-modal show",t.innerHTML=`<div class="results-card"><h4 class="mb-3">Confirm Submission</h4><p class="text-secondary mb-4">You have attempted ${e} of ${totalQuestions} questions.<br>Are you sure you want to submit?</p><div class="d-flex justify-content-center gap-2"><button onclick="startQuestionTimer(); this.closest('.results-modal').remove()" class="btn btn-outline-secondary">Cancel</button><button onclick="submitTest(); this.closest('.results-modal').remove()" class="btn btn-primary">Submit Test</button></div></div>`,document.body.appendChild(t)}}function submitTest(){if(!submitted){submitted=!0,clearInterval(timerInterval),stopAndRecordTime(),window.removeEventListener("beforeunload",beforeUnloadHandler),window.removeEventListener("popstate",popStateHandler);let e=0,t=0,o=0;questions.forEach((n,s)=>{const l=document.getElementById(`box-${s}`);l.classList.remove("attempted");const a=n.pos_marks||1,d=n.neg_marks||.25;answers[n.id]?answers[n.id]===n.correct?(e+=a,t++,l.classList.add("correct")):(e-=d,o++,l.classList.add("incorrect")):l.classList.add("unattempted")});const n=totalQuestions-(t+o);document.getElementById("score-value").textContent=e.toFixed(2),document.getElementById("correct-value").textContent=t,document.getElementById("incorrect-value").textContent=o,document.getElementById("unattempted-value").textContent=n,document.getElementById("results-modal").classList.add("show");const s=document.getElementById("submit-btn-header");s&&(s.disabled=!0,s.innerHTML='<i class="fas fa-check"></i>',s.classList.add("submitted-state")),sendToTelegramLog({type:"Test Submitted",userName:userName,userMobile:userMobile,score:e.toFixed(2),correct:t,incorrect:o,unattempted:n}),showQuestion(currentQuestion)}}function reviewTest(){document.getElementById("results-modal").classList.remove("show"),document.getElementById("floating-pdf-btn").style.display="flex",showQuestion(0)}window.addEventListener("click",e=>{e.target.classList.contains("results-modal")&&e.target.classList.remove("show")}),document.addEventListener("keydown",e=>{"ArrowLeft"===e.key&&prevQuestion(),"ArrowRight"===e.key&&nextQuestion()});async function sendToTelegramLog(e){if(!BOT_TOKEN||"YOUR_BOT_TOKEN_HERE"===BOT_TOKEN||!CHAT_ID)return;const t=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;let o="";const n=document.title,s=new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});"Test Started"===e.type?o=`🔴 *New Test Started!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Time:* \`${s}\``:"Test Submitted"===e.type&&(o=`✅ *Test Submitted!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Score:* *${e.score}*\n- *Correct:* ${e.correct}\n- *Incorrect:* ${e.incorrect}\n- *Unattempted:* ${e.unattempted}\n- *Time:* \`${s}\``);try{await fetch(t,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:CHAT_ID,text:o,parse_mode:"Markdown"})})}catch(e){console.error("Telegram log failed:",e)}}function downloadPDF(e){const t=e.innerHTML;e.disabled=!0,e.innerHTML='<span class="spinner-border spinner-border-sm"></span>';try{const{jsPDF:o}=window.jspdf,n=new o({unit:"pt",format:"a4",orientation:"portrait"});n.setFont("Helvetica","normal");let s=40;const l=n.internal.pageSize.height,a=40,d=n.internal.pageSize.width-2*a,c=()=>{n.addPage(),s=a};n.setFont("Helvetica","bold"),n.setFontSize(18),n.text(`Test Analysis: ${document.title}`,n.internal.pageSize.width/2,s,{align:"center"}),s+=20,n.setFont("Helvetica","normal"),n.setFontSize(12),n.text(`By: ${userName||"Kundan Yadav"}`,n.internal.pageSize.width/2,s,{align:"center"}),s+=15,n.text(`Mobile: ${userMobile||"N/A"}`,n.internal.pageSize.width/2,s,{align:"center"}),s+=20,n.setLineWidth(1.5),n.line(a,s,n.internal.pageSize.width-a,s),s+=30,n.setFontSize(10);const r=(d-30)/4,i=50,u=[{label:"Score",value:document.getElementById("score-value").textContent,color:[0,123,255]},{label:"Correct",value:document.getElementById("correct-value").textContent,color:[40,167,69]},{label:"Incorrect",value:document.getElementById("incorrect-value").textContent,color:[220,53,69]},{label:"Unattempted",value:document.getElementById("unattempted-value").textContent,color:[108,117,125]}];u.forEach((e,t)=>{n.setFillColor(e.color[0],e.color[1],e.color[2]),n.roundedRect(a+t*(r+10),s,r,i,5,5,"F"),n.setTextColor(255,255,255),n.setFont("Helvetica","bold"),n.setFontSize(16),n.text(e.value,a+t*(r+10)+r/2,s+25,{align:"center"}),n.setFont("Helvetica","normal"),n.setFontSize(10),n.text(e.label,a+t*(r+10)+r/2,s+40,{align:"center"})}),s+=i+30,n.setTextColor(0,0,0),questions.forEach((e,t)=>{s>l-150&&c(),n.setLineWidth(.5),n.line(a,s,n.internal.pageSize.width-a,s),s+=20,n.setFontSize(11),n.setFont("Helvetica","bold");const o=n.splitTextToSize(`Q${t+1}: ${e.question_en.replace(/\n/g," ")}`,d);n.text(o,a,s),s+=12*o.length+10,n.setFontSize(10),n.setFont("Helvetica","normal");const r=["a","b","c","d"];(e.options_en||[]).forEach((t,o)=>{const l=answers[e.id],i=e.correct,u=r[o];let m=`${String.fromCharCode(65+o)}) ${t}`;u===i?(n.setTextColor(40,167,69),m=(l===u?"✓ ":"  ")+m,n.text(m,a+15,s)):u===l?(n.setTextColor(220,53,69),n.text(`✗ ${m}`,a+15,s)):(n.setTextColor(50,50,50),n.text(`  ${m}`,a+15,s)),s+=15}),n.setTextColor(0,0,0);const p=timeSpent[e.id]||0,g=Math.floor(p/60),h=p%60;let f=answers[e.id]?answers[e.id]===e.correct?"Correct":"Incorrect":"Unattempted",k=answers[e.id]?answers[e.id]===e.correct?[40,167,69]:[220,53,69]:[108,117,125];n.setFont("Helvetica","bold"),n.setTextColor(k[0],k[1],k[2]),n.text(`Status: ${f}`,a,s),n.setFont("Helvetica","normal"),n.setFontSize(9),n.setTextColor(108,117,125),n.text(`Time Taken: ${g}m ${h}s`,n.internal.pageSize.width-a,s,{align:"right"}),s+=20,n.setFillColor(240,248,255),n.setDrawColor(220,220,220);const v=n.splitTextToSize(`Solution: ${e.solution_en}`,d-20);n.roundedRect(a,s-10,d,12*v.length+15,3,3,"F"),n.setTextColor(50,50,50),n.text(v,a+10,s),s+=12*v.length+15});const m=`${document.title} Result by Kundan.pdf`;n.save(m)}catch(e){console.error("Error generating PDF:",e),alert("Sorry, there was an error generating the PDF.")}finally{e.disabled=!1,e.innerHTML=t}}
+            let html = `<div class="question-card"><div class="question-text"><div class="en">${question.question_en.replace(/\n/g, '<br>')}</div><div class="hi" style="display:none">${question.question_hi.replace(/\n/g, '<br>')}</div></div><div class="options" id="options-container">`;
+            const options = ['a', 'b', 'c', 'd'];
+            (question.options_en || []).forEach((opt_label, i) => {
+                let optionClass = ''; let isUserAnswer = answers[question.id] === options[i];
+                if (submitted) {
+                    if (options[i] === question.correct) optionClass += ' correct-answer'; 
+                    else if (isUserAnswer) optionClass += ' incorrect';
+                }
+                html += `<div class="option-item"><input class="option-input" type="radio" name="q${index}" id="opt-${index}-${options[i]}" value="${options[i]}" ${isUserAnswer ? 'checked' : ''} onclick="selectAnswer('${question.id}', '${options[i]}')"><label class="option-label${optionClass}" for="opt-${index}-${options[i]}"><div class="en">${question.options_en[i]}</div><div class="hi" style="display:none">${question.options_hi[i]}</div></label></div>`;
+            });
+            html += `</div>`;
+            if (submitted) {
+                const resultText = answers[question.id] ? (answers[question.id] === question.correct ? 'Correct!' : 'Incorrect!') : 'Not attempted';
+                const time = timeSpent[question.id] || 0;
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+                html += `<div class="solution-container"><div class="solution-title">${resultText}</div><div class="solution-text"><div class="en">${question.solution_en}</div><div class="hi" style="display:none">${question.solution_hi}</div></div><div class="time-taken-info">Time Taken: ${minutes}m ${seconds}s</div></div>`;
+            }
+            html += `</div>`;
+            document.getElementById('questions-container').innerHTML = html;
+            applyLanguage();
+            if (window.innerWidth < 992) toggleNav(false);
+            if (submitted) document.getElementById('options-container').classList.add('review-mode');
+            if (typeof MathJax !== 'undefined') MathJax.typeset();
+            startQuestionTimer();
+        }
+        
+        function selectAnswer(qId, option) { if (submitted) return; answers[qId] = option; updateProgress(); document.getElementById(`box-${questions.findIndex(q => q.id === qId)}`).classList.add('attempted'); }
+        function prevQuestion() { if (currentQuestion > 0) showQuestion(currentQuestion - 1); }
+        function nextQuestion() { if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1); }
+        function toggleLanguage() { currentLang = currentLang === 'en' ? 'hi' : 'en'; applyLanguage(); }
+        function toggleNav(show) { const nav = document.getElementById('question-nav'); const overlay = document.getElementById('nav-overlay'); if (show === undefined) show = !nav.classList.contains('show'); nav.classList.toggle('show', show); overlay.classList.toggle('show', show); if (window.innerWidth < 992) document.body.style.overflow = show ? 'hidden' : ''; }
+        function updateProgress() { document.getElementById('attempted-count').textContent = Object.keys(answers).length; }
+
+        // --- Timer and Submission Flow ---
+        let timerInterval;
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer-display'); let timeLeft = totalTime;
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0 || submitted) { clearInterval(timerInterval); if (!submitted) submitTest(); return; }
+                timeLeft--;
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function confirmSubmit() {
+            if (submitted) return;
+            stopAndRecordTime();
+            const attempted = Object.keys(answers).length;
+            const modal = document.createElement('div');
+            modal.className = 'results-modal show';
+            modal.innerHTML = `<div class="results-card"><h4 class="mb-3">Confirm Submission</h4><p class="text-secondary mb-4">You have attempted ${attempted} of ${totalQuestions} questions.<br>Are you sure you want to submit?</p><div class="d-flex justify-content-center gap-2"><button onclick="startQuestionTimer(); this.closest('.results-modal').remove()" class="btn btn-outline-secondary">Cancel</button><button onclick="submitTest(); this.closest('.results-modal').remove()" class="btn btn-primary">Submit Test</button></div></div>`;
+            document.body.appendChild(modal);
+        }
+
+        function submitTest() {
+            if (submitted) return;
+            submitted = true;
+            clearInterval(timerInterval);
+            stopAndRecordTime();
+            window.removeEventListener('beforeunload', beforeUnloadHandler);
+            window.removeEventListener('popstate', popStateHandler);
+            
+            let score = 0, correctCount = 0, incorrectCount = 0;
+            questions.forEach((q, index) => {
+                const box = document.getElementById(`box-${index}`);
+                box.classList.remove('attempted');
+                
+                const pos_marks = q.pos_marks ?? 1;
+                const neg_marks = q.neg_marks ?? 0;
+                
+                if (!answers[q.id]) {
+                    box.classList.add('unattempted');
+                } else if (answers[q.id] === q.correct) {
+                    score += pos_marks;
+                    correctCount++;
+                    box.classList.add('correct');
+                } else {
+                    score -= neg_marks;
+                    incorrectCount++;
+                    box.classList.add('incorrect');
+                }
+            });
+            const unattemptedCount = totalQuestions - (correctCount + incorrectCount);
+            
+            document.getElementById('score-value').textContent = score.toFixed(2);
+            document.getElementById('correct-value').textContent = correctCount;
+            document.getElementById('incorrect-value').textContent = incorrectCount;
+            document.getElementById('unattempted-value').textContent = unattemptedCount;
+            document.getElementById('results-modal').classList.add('show');
+            
+            const submitBtn = document.getElementById('submit-btn-header');
+            if(submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-check"></i>';
+                submitBtn.classList.add('submitted-state');
+            }
+            
+            sendToTelegramLog({
+                type: 'Test Submitted', userName: userName, userMobile: userMobile,
+                score: score.toFixed(2), correct: correctCount,
+                incorrect: incorrectCount, unattempted: unattemptedCount
+            });
+
+            showQuestion(currentQuestion);
+        }
+        
+        function reviewTest() {
+            document.getElementById('results-modal').classList.remove('show');
+            document.getElementById('floating-pdf-btn').style.display = 'flex';
+            showQuestion(0);
+        }
+
+        // --- External Service Functions ---
+        async function sendToTelegramLog(data) {
+            if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !CHAT_ID) return;
+            const telegramApiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            let messageText = '';
+            const testName = document.title;
+            const dateTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            if (data.type === 'Test Started') {
+                messageText = `🔴 *Test Started!*\n\n- *User:* \`${data.userName || 'N/A'}\`\n- *Mobile:* \`${data.userMobile || 'N/A'}\`\n- *Test:* \`${testName}\`\n- *Time:* \`${dateTime}\``;
+            } else if (data.type === 'Test Submitted') {
+                messageText = `✅ *Test Submitted!*\n\n- *User:* \`${data.userName || 'N/A'}\`\n- *Mobile:* \`${data.userMobile || 'N/A'}\`\n- *Test:* \`${testName}\`\n- *Score:* *${data.score}*\n- *Correct:* ${data.correct}\n- *Incorrect:* ${data.incorrect}\n- *Unattempted:* ${data.unattempted}\n- *Time:* \`${dateTime}\``;
+            }
+            try {
+                await fetch(telegramApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: messageText, parse_mode: 'Markdown' })
+                });
+            } catch (error) { console.error('Telegram log failed:', error); }
+        }
+
+        function downloadPDF(btnElement) {
+            const originalContent = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
+                pdf.setFont('Helvetica', 'normal');
+                
+                let y = 40; const margin = 40; const maxWidth = pdf.internal.pageSize.width - margin * 2;
+                const addNewPage = () => { pdf.addPage(); y = margin; };
+
+                pdf.setFont('Helvetica', 'bold');
+                pdf.setFontSize(18);
+                pdf.text(`Test Analysis: ${document.title}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
+                y += 20;
+                pdf.setFont('Helvetica', 'normal');
+                pdf.setFontSize(12);
+                pdf.text(`By: ${userName || 'Kundan Yadav'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
+                y += 15;
+                pdf.text(`Mobile: ${userMobile || 'N/A'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
+                y += 20;
+                pdf.setLineWidth(1.5);
+                pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
+                y += 30;
+
+                pdf.setFontSize(10);
+                const cardWidth = (maxWidth - 30) / 4; const cardHeight = 50;
+                const stats = [
+                    {label: 'Score', value: document.getElementById('score-value').textContent, color: [0, 123, 255]},
+                    {label: 'Correct', value: document.getElementById('correct-value').textContent, color: [40, 167, 69]},
+                    {label: 'Incorrect', value: document.getElementById('incorrect-value').textContent, color: [220, 53, 69]},
+                    {label: 'Unattempted', value: document.getElementById('unattempted-value').textContent, color: [108, 117, 125]}
+                ];
+                stats.forEach((stat, index) => {
+                    pdf.setFillColor(stat.color[0], stat.color[1], stat.color[2]);
+                    pdf.roundedRect(margin + index * (cardWidth + 10), y, cardWidth, cardHeight, 5, 5, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFont('Helvetica', 'bold');
+                    pdf.setFontSize(16);
+                    pdf.text(stat.value, margin + index * (cardWidth + 10) + cardWidth / 2, y + 25, { align: 'center' });
+                    pdf.setFont('Helvetica', 'normal');
+                    pdf.setFontSize(10);
+                    pdf.text(stat.label, margin + index * (cardWidth + 10) + cardWidth / 2, y + 40, { align: 'center' });
+                });
+                y += cardHeight + 30;
+                pdf.setTextColor(0, 0, 0);
+
+                questions.forEach((q, index) => {
+                    if (y > pdf.internal.pageSize.height - 150) { addNewPage(); }
+                    pdf.setLineWidth(0.5);
+                    pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
+                    y += 20;
+
+                    pdf.setFontSize(11);
+                    pdf.setFont('Helvetica', 'bold');
+                    const questionText = pdf.splitTextToSize(`Q${index + 1}: ${q.question_en.replace(/\n/g, ' ')}`, maxWidth);
+                    pdf.text(questionText, margin, y);
+                    y += questionText.length * 12 + 10;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('Helvetica', 'normal');
+                    
+                    const options = ['a', 'b', 'c', 'd'];
+                    (q.options_en || []).forEach((opt_label, i) => {
+                        const userAnswer = answers[q.id];
+                        const correctOpt = q.correct;
+                        const opt = options[i];
+                        let prefix = `${String.fromCharCode(65 + i)}) ${opt_label}`;
+                        
+                        if (opt === correctOpt) {
+                            pdf.setTextColor(40, 167, 69);
+                            prefix = (userAnswer === opt ? '✓ ' : '  ') + prefix;
+                            pdf.text(prefix, margin + 15, y);
+                        } else if (opt === userAnswer) {
+                            pdf.setTextColor(220, 53, 69);
+                            pdf.text(`✗ ${prefix}`, margin + 15, y);
+                        } else {
+                            pdf.setTextColor(50, 50, 50);
+                            pdf.text(`  ${prefix}`, margin + 15, y);
+                        }
+                        y += 15;
+                    });
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    const time = timeSpent[q.id] || 0;
+                    const minutes = Math.floor(time / 60); const seconds = time % 60;
+                    let statusText = !answers[q.id] ? 'Unattempted' : answers[q.id] === q.correct ? 'Correct' : 'Incorrect';
+                    let statusColor = !answers[q.id] ? [108, 117, 125] : answers[q.id] === q.correct ? [40, 167, 69] : [220, 53, 69];
+
+                    pdf.setFont('Helvetica', 'bold');
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.text(`Status: ${statusText}`, margin, y);
+                    
+                    pdf.setFont('Helvetica', 'normal');
+                    pdf.setFontSize(9);
+                    pdf.setTextColor(108, 117, 125);
+                    pdf.text(`Time Taken: ${minutes}m ${seconds}s`, pdf.internal.pageSize.width - margin, y, { align: 'right'});
+                    y += 20;
+                    
+                    pdf.setFillColor(240, 248, 255);
+                    const solutionLines = pdf.splitTextToSize(`Solution: ${q.solution_en}`, maxWidth - 20);
+                    pdf.roundedRect(margin, y - 10, maxWidth, solutionLines.length * 12 + 15, 3, 3, 'F');
+                    pdf.setTextColor(50, 50, 50);
+                    pdf.text(solutionLines, margin + 10, y);
+                    y += solutionLines.length * 12 + 15;
+                });
+
+                const pdfFileName = `${document.title} Result by Kundan.pdf`;
+                pdf.save(pdfFileName);
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                alert("Sorry, there was an error generating the PDF.");
+            } finally {
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalContent;
+            }
+        }
     </script>
 </body>
 </html>
