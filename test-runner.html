@@ -474,8 +474,25 @@
                 y += 20;
                 pdf.setFont('Helvetica', 'normal');
                 pdf.setFontSize(12);
-                pdf.text(`By: ${userName || 'Kundan Yadav'}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
-                y += 15;
+                // Fixed branding text
+const brandingText = "By: 𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎";
+const pageWidth = pdf.internal.pageSize.width;
+
+// Text width calculate for center alignment
+const textWidth = pdf.getTextWidth(brandingText);
+const x = (pageWidth - textWidth) / 2; // center ka X position
+
+// Set font size & color
+pdf.setFontSize(14);
+pdf.setTextColor(0, 102, 204); // Blue-ish branding color
+
+// Clickable branding text
+pdf.textWithLink(brandingText, x, y, {
+  url: 'https://t.me/kundan_yadav_bot'
+});
+
+y += 15;
+
                 
                 pdf.setLineWidth(1.5);
                 pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
