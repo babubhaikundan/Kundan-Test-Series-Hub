@@ -15,7 +15,7 @@
     <style>
         /* --- Root Variables & Dark Mode --- */
         :root{--primary:#007bff;--primary-light:#52a4ff;--primary-dark:#0056b3;--secondary:#6c757d;--accent:#ffc107;--success:#28a745;--danger:#dc3545;--light:#f8f9fa;--dark:#343a40;--gray:#6c757d;--light-gray:#dfe6e9;--card-bg:#fff;--body-bg:#f4f7fe;--header-bg:linear-gradient(135deg,var(--primary),var(--primary-dark));--footer-bg:#fff;--box-shadow:0 4px 20px rgba(0,0,0,.08);--transition:all .3s cubic-bezier(.25,.8,.25,1)}
-        body.dark-mode{--light:#2c3e50;--dark:#ecf0f1;--gray:#95a5a6;--light-gray:#34495e;--card-bg:#2c3e50;--body-bg:#233142;--footer-bg:#2c3e50;--box-shadow:0 4px 20px rgba(0,0,0,.3)}
+        body.dark-mode{--light:#2c3e50;--dark:#ecf0f1;--gray:#95a5a6;--light-gray:#34495e;--card-bg:#2c3e50;--body-bg:#233142;--footer-bg:#2c3e50;--box-shadow:0 4px 20px rgba(0,0,0,.3);--accent:#f1c40f}
         body.dark-mode .option-input:checked+.option-label{background:rgba(0,123,255,.15)}
         body.dark-mode .solution-container{background:rgba(0,123,255,.1)}
         body.dark-mode .review-mode .option-label.correct-answer{background:rgba(40,167,69,.1)}
@@ -33,6 +33,7 @@
         #welcome-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden;background-size:cover;background-position:center center}
         #welcome-screen::before{content:'';position:absolute;top:-10px;left:-10px;right:-10px;bottom:-10px;z-index:-1;background:linear-gradient(rgba(29,36,47,.7),rgba(29,36,47,.7));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
         .welcome-card{background:rgba(255,255,255,.1);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:32px;width:100%;max-width:500px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);animation:fadeInUp .8s cubic-bezier(.25,.8,.25,1) forwards}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
         .welcome-icon{font-size:3rem;color:#fff;margin-bottom:16px;text-shadow:0 2px 10px rgba(0,0,0,.2)}
         .welcome-card h3{font-weight:700;font-size:1.8rem;color:#fff;margin-bottom:8px;text-shadow:0 1px 5px rgba(0,0,0,.2)}
         .welcome-branding a{color:rgba(255,255,255,.8);font-size:1.1rem;font-weight:500;text-decoration:none;margin-bottom:32px;display:inline-block;transition:var(--transition)}
@@ -44,13 +45,12 @@
         .stat-item .value{font-size:1.4rem;font-weight:600;color:#fff}
         .stat-item .label{font-size:.85rem;color:rgba(255,255,255,.7);font-weight:500}
         #start-test-btn{width:100%;padding:14px;font-size:1.1rem;font-weight:600;border-radius:12px;animation:pulse 2s infinite}
-        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,.4)}70%{transform:scale(1.02);box-shadow:0 0 0 10px rgba(0,123,255,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,0)}}
         
         /* --- Main Test UI: Header & Footer --- */
         .header{position:fixed;top:0;left:0;right:0;height:60px;background:var(--header-bg);color:#fff;display:flex;align-items:center;padding:0 16px;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.1)}
         .header-content{display:flex;justify-content:space-between;align-items:center;width:100%;gap:8px}
-        .header-brand{display:flex;align-items:center;font-weight:600;font-size:.9rem;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-grow:1;min-width:0}
+        .header-brand{display:flex;align-items:center;font-weight:600;font-size:.9rem;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 0;min-width:0}
         .header-brand i{margin-right:8px;font-size:1.2rem;flex-shrink:0}
         .header-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
         .control-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);flex-shrink:0}
@@ -63,9 +63,17 @@
         
         .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:var(--footer-bg);box-shadow:0 -2px 10px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:800;transition:background-color .3s}
         .nav-btn{height:48px;border-radius:12px;border:1px solid var(--primary);font-weight:500;display:flex;align-items:center;justify-content:center;padding:0 20px;transition:var(--transition);gap:8px;background:0 0;color:var(--primary);flex-shrink:0}
-        #mark-review-btn { flex-grow: 1; margin: 0 8px; border: 1px solid var(--secondary); color: var(--secondary); max-width: 150px; }
-        #mark-review-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
-        #mark-review-btn .fa-flag { transition: all 0.2s; }
+        
+        .branding-mobile-container { flex-grow: 1; text-align: center; display: none; }
+        .branding-link-mobile{text-decoration:none;font-weight:500;font-size:.75rem;line-height:1.3; color: var(--secondary);}
+        .branding-link-mobile:hover{color: var(--primary);}
+        
+        #inline-mark-btn { flex-grow: 1; margin: 0 8px; border-color: var(--secondary); color: var(--secondary); max-width: 150px; display: none; }
+        #inline-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+        #inline-mark-btn .fa-flag { transition: all 0.2s; }
+        
+        #floating-mark-btn { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 850; display: none; background-color: var(--card-bg); border-color: var(--secondary); color: var(--secondary); box-shadow: 0 -2px 10px rgba(0,0,0,.1); }
+        #floating-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
         
         .desktop-footer{position:fixed;bottom:0;left:0;right:320px;height:40px;background:var(--dark);color:#fff;align-items:center;justify-content:center;z-index:850;display:none}
         .desktop-footer.show{display:flex}
@@ -73,7 +81,7 @@
         .desktop-footer a:hover{color:var(--accent)}
         
         /* --- Main Test UI: Question & Options --- */
-        .main-content{padding:16px}
+        .main-content{padding:16px;padding-bottom: 20px;}
         .question-card,.results-card,.question-nav{background:var(--card-bg);transition:background-color .3s}
         .question-card{border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid transparent;overflow:hidden}
         .question-counter{font-size:.9rem;color:var(--gray);text-align:center;margin-bottom:16px;font-weight:500}
@@ -97,7 +105,7 @@
         .solution-title{font-weight:600;margin-bottom:8px;color:var(--primary)}
         .time-taken-info{font-size:.8rem;color:var(--secondary);font-style:italic;margin-top:10px}
         
-        /* --- Main Test UI: Question Navigator (Sidebar) --- */
+        /* --- Question Navigator (Sidebar) --- */
         .question-nav{position:fixed;top:60px;right:0;bottom:0;width:100%;max-width:320px;box-shadow:-5px 0 15px rgba(0,0,0,.1);transform:translateX(100%);transition:var(--transition);z-index:900;overflow-y:auto;padding:16px}
         .question-nav.show{transform:translateX(0)}
         .nav-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
@@ -115,7 +123,7 @@
         .nav-overlay{position:fixed;top:60px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:890;opacity:0;pointer-events:none;transition:var(--transition)}
         .nav-overlay.show{opacity:1;pointer-events:all}
         
-        /* --- Modals --- */
+        /* --- Modals & Other Components --- */
         .results-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1100;opacity:0;pointer-events:none;transition:var(--transition);padding:16px}
         .results-modal.show{opacity:1;pointer-events:all}
         .results-card{border-radius:20px;width:100%;max-width:500px;padding:20px;text-align:center}
@@ -134,7 +142,6 @@
         .user-details-card .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,123,255,.25);outline:none}
         .user-details-card .btn-proceed{width:100%;padding:12px;font-size:1rem;font-weight:500;border-radius:10px;margin-top:20px}
         
-        /* --- Floating Buttons & Responsive Design --- */
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
         
@@ -149,9 +156,7 @@
         <div class="welcome-card">
             <div class="welcome-icon"><i class="fas fa-brain"></i></div>
             <h3 id="welcome-title">Loading Test...</h3>
-            <div class="welcome-branding">
-                <a href="https://t.me/kundan_yadav_bot" target="_blank">By: <span class="kundan-font">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</span></a>
-            </div>
+            <div class="welcome-branding"><a href="https://t.me/kundan_yadav_bot" target="_blank">By: <span class="kundan-font">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</span></a></div>
             <div class="welcome-stats">
                 <div class="stat-item"><div class="icon"><i class="fas fa-list-ol"></i></div><div class="value" id="welcome-q-count">--</div><div class="label">Questions</div></div>
                 <div class="stat-item"><div class="icon"><i class="fas fa-star"></i></div><div class="value" id="welcome-marks">--</div><div class="label">Total Marks</div></div>
@@ -209,10 +214,18 @@
         <!-- Overlay -->
         <div class="nav-overlay" id="nav-overlay" onclick="toggleNav(false)"></div>
         
+        <!-- Floating Mark Button (for when branding is shown) -->
+        <button id="floating-mark-btn" class="nav-btn" onclick="markQuestionForReview()">
+            <i class="far fa-flag"></i> Mark
+        </button>
+
         <!-- Bottom Navigation (Mobile) -->
         <nav class="bottom-nav d-lg-none">
             <button class="nav-btn" onclick="prevQuestion()"><i class="fas fa-chevron-left"></i> Prev</button>
-            <button id="mark-review-btn" class="nav-btn" onclick="markQuestionForReview()">
+            <div class="branding-mobile-container">
+                <a href="https://t.me/kundan_yadav_bot" target="_blank" class="branding-link-mobile">Contact here👇<br>𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</a>
+            </div>
+            <button id="inline-mark-btn" class="nav-btn" onclick="markQuestionForReview()">
                 <i class="far fa-flag"></i> Mark
             </button>
             <button class="nav-btn" onclick="nextQuestion()">Next <i class="fas fa-chevron-right"></i></button>
@@ -248,7 +261,7 @@
         let questions = [], totalQuestions = 0;
         let currentLang = "en", currentQuestion = 0;
         let answers = {}, submitted = false, testStarted = false;
-        let totalTime = 0, timeSpent = {}, questionTimer, timeOnCurrentQuestion = 0;
+        let totalTime = 0, timeSpent = {}, timerInterval, questionTimer, timeOnCurrentQuestion = 0;
         let markedForReview = {};
 
         const backgroundImages = [
@@ -259,7 +272,6 @@
         // --- INITIALIZATION & EVENT LISTENERS ---
         window.onload = function() { 
             setRandomBackground();
-            // *** FIX: Corrected initialization flow. `initializeTest` only runs after `loadTest` is successful.
             loadTest().then(() => {
                 initializeTest(); 
                 handleResize(); 
@@ -318,12 +330,12 @@
                 console.error("Error loading test:", e);
                 document.getElementById('welcome-title').textContent = "Error Loading Test";
                 document.getElementById('start-area').innerHTML = `<p style="color: #ffdddd;">${e.message}</p>`;
-                throw e; // Re-throw error to be caught by the .catch() in window.onload
+                throw e; 
             }
         }
         function initializeTest() {
             const boxesContainer = document.getElementById('question-boxes');
-            boxesContainer.innerHTML = ''; // Clear previous boxes if any
+            boxesContainer.innerHTML = ''; 
             questions.forEach((q, index) => {
                 const box = document.createElement('div');
                 box.className = 'q-box';
@@ -368,6 +380,21 @@
             document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
             document.getElementById(`box-${index}`).classList.add('current');
             
+            // Handle branding and Mark button visibility
+            const brandingContainer = document.querySelector('.branding-mobile-container');
+            const inlineMarkBtn = document.getElementById('inline-mark-btn');
+            const floatingMarkBtn = document.getElementById('floating-mark-btn');
+
+            const showBranding = !submitted && ((index < 5) || (index >= totalQuestions - 5));
+            if (showBranding) {
+                brandingContainer.style.display = 'block';
+                inlineMarkBtn.style.display = 'none';
+                floatingMarkBtn.style.display = 'flex';
+            } else {
+                brandingContainer.style.display = 'none';
+                inlineMarkBtn.style.display = 'flex';
+                floatingMarkBtn.style.display = 'none';
+            }
             updateMarkForReviewUI();
 
             let langToggleHTML = `<div class="lang-toggle-container"><button class="lang-toggle-btn ${currentLang === 'en' ? 'active' : ''}" onclick="toggleLanguage('en')">English</button><button class="lang-toggle-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="toggleLanguage('hi')">हिंदी</button></div>`;
@@ -381,7 +408,7 @@
             html += `</div>`;
             if (submitted) {
                 const resultText = answers[question.id] ? (answers[question.id] === question.correct ? 'Correct!' : 'Incorrect!') : 'Not attempted';
-                const time = timeSpent[q.id] || 0;
+                const time = timeSpent[question.id] || 0;
                 const minutes = Math.floor(time / 60); const seconds = time % 60;
                 html += `<div class="solution-container"><div class="solution-title">${resultText}</div><div class="solution-text"><div class="en">${question.solution_en}</div><div class="hi" style="display:none">${question.solution_hi}</div></div><div class="time-taken-info">Time Taken: ${minutes}m ${seconds}s</div></div>`;
             }
@@ -419,7 +446,7 @@
         function startTimer() {
             const timerDisplay = document.getElementById('timer-display'); 
             let timeLeft = totalTime;
-            const timerInterval = setInterval(() => {
+            timerInterval = setInterval(() => {
                 if (timeLeft <= 0 || submitted) { 
                     clearInterval(timerInterval); 
                     if (!submitted) submitTest(); 
@@ -444,19 +471,26 @@
             if (submitted) return;
             const qId = questions[currentQuestion].id;
             const isMarked = markedForReview[qId];
-            
-            const btn = document.getElementById('mark-review-btn');
             const box = document.getElementById(`box-${currentQuestion}`);
-            const icon = btn.querySelector('i');
+            
+            // Update both buttons regardless of which is visible
+            const buttonsToUpdate = [document.getElementById('inline-mark-btn'), document.getElementById('floating-mark-btn')];
+            
+            buttonsToUpdate.forEach(btn => {
+                if (!btn) return;
+                const icon = btn.querySelector('i');
+                if (isMarked) {
+                    btn.classList.add('marked');
+                    icon.className = 'fas fa-flag';
+                } else {
+                    btn.classList.remove('marked');
+                    icon.className = 'far fa-flag';
+                }
+            });
 
-            if (isMarked) {
-                btn.classList.add('marked');
-                box.classList.add('marked');
-                icon.className = 'fas fa-flag';
-            } else {
-                btn.classList.remove('marked');
-                box.classList.remove('marked');
-                icon.className = 'far fa-flag';
+            if (box) {
+                if (isMarked) box.classList.add('marked');
+                else box.classList.remove('marked');
             }
         }
         
@@ -465,13 +499,12 @@
         function submitTest() {
             if (submitted) return; 
             submitted = true; 
-            // `clearInterval` is called inside `startTimer`'s interval.
+            clearInterval(timerInterval);
             stopAndRecordTime();
             window.removeEventListener('beforeunload', beforeUnloadHandler);
-            window.removeEventListener('popstate', popStateHandler);
             
-            const markBtn = document.getElementById('mark-review-btn');
-            if (markBtn) markBtn.style.display = 'none';
+            document.getElementById('inline-mark-btn').style.display = 'none';
+            document.getElementById('floating-mark-btn').style.display = 'none';
 
             let score = 0, correctCount = 0, incorrectCount = 0;
             questions.forEach((q, index) => {
