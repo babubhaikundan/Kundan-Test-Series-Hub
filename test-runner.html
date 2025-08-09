@@ -51,15 +51,15 @@
         /* --- Main Test UI: Header & Footer --- */
         .header{position:fixed;top:0;left:0;right:0;height:60px;background:var(--header-bg);color:#fff;display:flex;align-items:center;padding:0 16px;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.1)}
         .header-content{display:flex;justify-content:space-between;align-items:center;width:100%}
-        .header-brand{display:flex;align-items:center;font-weight:600;font-size:.85rem;color:#fff;text-decoration:none}
+        .header-brand{display:flex;align-items:center;font-weight:600;font-size:.85rem;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
         .header-brand i{margin-right:8px;font-size:1.2rem}
-        .header-controls{display:flex;align-items:center;gap:8px}
-        .control-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition)}
+        .header-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .control-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);flex-shrink:0}
         .control-btn:hover{background:rgba(255,255,255,.2)}
-        .submit-btn-header{height:36px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);padding:0 12px;font-weight:500;font-size:.85rem}
+        .submit-btn-header{height:36px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);padding:0 12px;font-weight:500;font-size:.85rem;flex-shrink:0}
         .submit-btn-header.submitted-state{padding:0;width:36px;background-color:var(--success);border-color:var(--success);cursor:default}
         .submit-btn-header:hover:not(.submitted-state){background:rgba(255,255,255,.25)}
-        .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 12px;font-size:.85rem;font-weight:500;display:flex;align-items:center}
+        .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 12px;font-size:.85rem;font-weight:500;display:flex;align-items:center;flex-shrink:0}
         .timer-display i{margin-right:6px}
         .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:var(--footer-bg);box-shadow:0 -2px 10px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:800;transition:background-color .3s}
         .nav-btn{height:48px;border-radius:12px;border:1px solid var(--primary);font-weight:500;display:flex;align-items:center;justify-content:center;padding:0 20px;transition:var(--transition);gap:8px;background:0 0;color:var(--primary);flex-shrink:0}
@@ -130,8 +130,18 @@
         /* --- Floating Buttons & Responsive Design --- */
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
+        
         @media (min-width:992px){.main-content{margin-right:320px}.question-nav{transform:translateX(0);bottom:40px}.bottom-nav{display:none}#floating-pdf-btn{right:340px;bottom:60px}}
         @media (max-width:991.98px){.desktop-footer{display:none!important}.question-nav{bottom:80px}}
+        
+        /* Responsive adjustments for very small screens to prevent header overflow */
+        @media (max-width: 420px) {
+          .header-brand { font-size: 0.75rem; max-width: 100px; } /* Reduce font size and limit width */
+          .timer-display { padding: 4px 6px; font-size: 0.8rem; }
+          .submit-btn-header { padding: 0 8px; font-size: 0.8rem; }
+          .header-controls { gap: 4px; } /* Reduce space between buttons */
+          .control-btn { width: 32px; height: 32px; }
+        }
     </style>
 </head>
 <body class="welcome-mode">
@@ -260,9 +270,6 @@
 
     <script>
         // --- CONFIGURATION & GLOBAL VARIABLES ---
-        // !!! WARNING: NEVER SHARE THESE TOKENS PUBLICLY IN PRODUCTION ENVIRONMENTS !!!
-        // Agar aap is HTML file ko kisi website par daalte hain, to yeh tokens churaye ja sakte hain.
-        // Yeh tareeka sirf personal ya offline use ke liye hai.
         const BOT_TOKEN = '8338911838:AAG5qTixTQyun4ktSUufxgOf1RDL25FhIWY';
         const CHAT_ID = '-1002588189635';
         
@@ -273,7 +280,6 @@
         let answers = {}, submitted = false, testStarted = false;
         let totalTime = 0, timeSpent = {}, questionTimer, timeOnCurrentQuestion = 0;
 
-        // Welcome screen background images
         const backgroundImages = [
             'https://s.tfrbot.com/h/r8dCRJ', 'https://s.tfrbot.com/h/sRMf7S',
             'https://s.tfrbot.com/h/Vf6F3e', 'https://s.tfrbot.com/h/BEnHxJ'
@@ -283,7 +289,6 @@
 
         /**
          * Runs when the window is fully loaded.
-         * Sets up the test environment.
          */
         window.onload = function() { 
             setRandomBackground();
@@ -291,10 +296,8 @@
                 initializeTest(); 
                 handleResize(); 
                 window.addEventListener('resize', handleResize);
-                // Manage browser history to handle back button presses
                 history.replaceState({page: 'instructions'}, 'Instructions', '#instructions'); 
                 window.addEventListener('popstate', popStateHandler); 
-                // Apply saved theme
                 if (localStorage.getItem('theme') === 'dark') {
                     document.body.classList.add('dark-mode');
                     const themeIcon = document.querySelector('#theme-toggle-btn i');
@@ -307,9 +310,6 @@
             });
         };
 
-        /**
-         * Warns the user before they leave the page during an active test.
-         */
         const beforeUnloadHandler = (e) => {
             if (testStarted && !submitted) {
                 e.preventDefault(); 
@@ -317,9 +317,6 @@
             }
         };
 
-        /**
-         * Handles the browser's back/forward button clicks.
-         */
         const popStateHandler = (event) => {
             if (testStarted && !submitted && event.state && event.state.page === 'instructions') {
                 const exitConfirm = confirm("Are you sure you want to exit the test? Your progress will not be saved.");
@@ -354,7 +351,6 @@
         function showUserDetailsPopup() {
             document.getElementById('user-details-modal').classList.add('show');
             document.body.style.overflow = 'hidden';
-            // Pre-fill details from localStorage if available
             document.getElementById('user-name-input').value = localStorage.getItem('userName') || '';
             document.getElementById('user-mobile-input').value = localStorage.getItem('userMobile') || '';
         }
@@ -374,19 +370,12 @@
             }
         }
         
-        /**
-         * Adjusts UI elements based on window size.
-         */
         function handleResize() { 
             const nav = document.getElementById('question-nav'); 
-            // Show sidebar permanently on large screens
             if (window.innerWidth >= 992) { nav.classList.add('show'); } 
             else { nav.classList.remove('show'); } 
         }
 
-        /**
-         * Sets a random background image for the welcome screen.
-         */
         function setRandomBackground() {
             const welcomeScreen = document.getElementById('welcome-screen');
             const randomIndex = Math.floor(Math.random() * backgroundImages.length);
@@ -395,26 +384,20 @@
         
         // --- TEST DATA & SETUP ---
 
-        /**
-         * Loads test data from the JSON file specified in the URL.
-         */
         async function loadTest() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const testId = urlParams.get('test');
                 if (!testId) throw new Error("No test ID provided in the URL.");
 
-                // Fetch test data, adding a timestamp to prevent caching
                 const response = await fetch(`tests/${testId}.json?t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Could not load data file: tests/${testId}.json`);
                 const testData = await response.json();
                 
-                // Populate global variables with test data
                 questions = testData.questions;
                 totalQuestions = questions.length;
                 totalTime = testData.time * 60;
                 
-                // Update UI elements on the welcome screen
                 document.title = testData.title;
                 document.getElementById('welcome-title').textContent = testData.title;
                 document.getElementById('header-title').textContent = testData.title;
@@ -441,9 +424,6 @@
             }
         }
         
-        /**
-         * Creates the question navigation boxes after test data is loaded.
-         */
         function initializeTest() {
             const boxesContainer = document.getElementById('question-boxes');
             questions.forEach((q, index) => {
@@ -459,16 +439,12 @@
 
         // --- TEST CORE LOGIC ---
         
-        /**
-         * Validates user details and starts the test.
-         */
         function proceedToTest() {
             userName = document.getElementById('user-name-input').value.trim();
             userMobile = document.getElementById('user-mobile-input').value.trim();
             if (!userName) { alert('Please enter your name.'); return; }
             if (!userMobile || !/^\d{10}$/.test(userMobile)) { alert('Please enter a valid 10-digit mobile number.'); return; }
             
-            // Save details for future tests
             localStorage.setItem('userName', userName);
             localStorage.setItem('userMobile', userMobile);
 
@@ -486,10 +462,6 @@
         function startQuestionTimer() { if (submitted || !testStarted) return; timeOnCurrentQuestion = 0; questionTimer = setInterval(() => { timeOnCurrentQuestion++; }, 1000); }
         function stopAndRecordTime() { clearInterval(questionTimer); if (questions.length > 0 && currentQuestion < questions.length) { const qId = questions[currentQuestion].id; timeSpent[qId] = (timeSpent[qId] || 0) + timeOnCurrentQuestion; } }
         
-        /**
-         * Displays a specific question and its options.
-         * @param {number} index - The index of the question to show.
-         */
         function showQuestion(index) {
             if (index < 0 || index >= questions.length) return;
             stopAndRecordTime();
@@ -497,11 +469,9 @@
             const question = questions[index];
             document.getElementById('question-counter').textContent = `Question ${index + 1} of ${totalQuestions}`;
             
-            // Highlight the current question box in the navigator
             document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
             document.getElementById(`box-${index}`).classList.add('current');
             
-            // Show branding on first/last few questions
             const mobileBranding = document.getElementById('mobile-branding');
             const desktopBranding = document.getElementById('desktop-branding');
             if (!submitted && ((index < 5) || (index >= totalQuestions - 5))) {
@@ -512,12 +482,10 @@
                 if(desktopBranding) desktopBranding.classList.remove('show');
             }
 
-            // Build the HTML for the question card
             let html = `<div class="question-card"><div class="question-text"><div class="en">${question.question_en.replace(/\n/g, '<br>')}</div><div class="hi" style="display:none">${question.question_hi.replace(/\n/g, '<br>')}</div></div><div class="options" id="options-container">`;
             const options = ['a', 'b', 'c', 'd'];
             (question.options_en || []).forEach((opt_label, i) => {
                 let optionClass = ''; let isUserAnswer = answers[question.id] === options[i];
-                // Add classes for review mode
                 if (submitted) {
                     if (options[i] === question.correct) optionClass += ' correct-answer'; 
                     else if (isUserAnswer) optionClass += ' incorrect';
@@ -526,7 +494,6 @@
             });
             html += `</div>`;
             
-            // If submitted, show solution and time taken
             if (submitted) {
                 const resultText = answers[question.id] ? (answers[question.id] === question.correct ? 'Correct!' : 'Incorrect!') : 'Not attempted';
                 const time = timeSpent[question.id] || 0;
@@ -540,7 +507,7 @@
             applyLanguage();
             if (window.innerWidth < 992) toggleNav(false);
             if (submitted) document.getElementById('options-container').classList.add('review-mode');
-            if (typeof MathJax !== 'undefined') MathJax.typeset(); // Re-render math formulas
+            if (typeof MathJax !== 'undefined') MathJax.typeset();
             startQuestionTimer();
         }
 
@@ -571,9 +538,6 @@
 
         // --- SUBMISSION & RESULTS ---
 
-        /**
-         * Shows a confirmation popup before submitting the test.
-         */
         function confirmSubmit() {
             if (submitted) return;
             stopAndRecordTime();
@@ -584,9 +548,6 @@
             document.body.appendChild(modal);
         }
 
-        /**
-         * Submits the test, calculates the score, and displays the results.
-         */
         function submitTest() {
             if (submitted) return; 
             submitted = true; 
@@ -616,47 +577,36 @@
             });
             const unattemptedCount = totalQuestions - (correctCount + incorrectCount);
             
-            // Display results in the modal
             document.getElementById('score-value').textContent = score.toFixed(2);
             document.getElementById('correct-value').textContent = correctCount;
             document.getElementById('incorrect-value').textContent = incorrectCount;
             document.getElementById('unattempted-value').textContent = unattemptedCount;
             document.getElementById('results-modal').classList.add('show');
             
-            // Update the submit button UI
             const submitBtn = document.getElementById('submit-btn-header'); 
             if(submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-check"></i>'; submitBtn.classList.add('submitted-state'); }
             
-            // Send results to Telegram
             sendToTelegramLog({
                 type: 'Test Submitted', userName: userName, userMobile: userMobile,
                 score: score.toFixed(2), correct: correctCount,
                 incorrect: incorrectCount, unattempted: unattemptedCount
             });
-            showQuestion(currentQuestion); // Refresh current question to show solution
+            showQuestion(currentQuestion);
         }
 
-        /**
-         * Closes the results modal and enters review mode.
-         */
         function reviewTest() {
             document.getElementById('results-modal').classList.remove('show');
             document.getElementById('floating-pdf-btn').style.display = 'flex';
             showQuestion(0);
         }
 
-        // Add event listeners for modal closing and keyboard navigation
         window.addEventListener('click', e => { if (e.target.classList.contains('results-modal')) e.target.classList.remove('show'); });
         document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') prevQuestion(); if (e.key === 'ArrowRight') nextQuestion(); });
 
         // --- UTILITIES (TELEGRAM & PDF) ---
 
-        /**
-         * Sends a log message to a Telegram chat.
-         * @param {object} data - The data to be sent.
-         */
         async function sendToTelegramLog(data) {
-            if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !CHAT_ID) {
+            if (!BOT_TOKEN || !CHAT_ID) {
                 console.warn("Telegram API credentials are not set. Logging is disabled."); return;
             }
             const telegramApiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
@@ -679,10 +629,6 @@
             } catch (error) { console.error('Telegram log failed:', error); }
         }
 
-        /**
-         * Generates and downloads a PDF report of the test results.
-         * @param {HTMLElement} btnElement - The button that was clicked.
-         */
         function downloadPDF(btnElement) {
             const originalContent = btnElement.innerHTML;
             btnElement.disabled = true;
@@ -697,7 +643,6 @@
                 const addNewPage = () => { pdf.addPage(); y = margin; };
 
                 // --- PDF Header ---
-                // Main Title (Center)
                 pdf.setFont('Helvetica', 'bold');
                 pdf.setFontSize(18);
                 pdf.text(`Test Analysis: ${document.title}`, pdf.internal.pageSize.width / 2, y, { align: 'center' });
@@ -706,11 +651,11 @@
                 // Developer Branding (Center)
                 pdf.setFont('Helvetica', 'normal');
                 pdf.setFontSize(12);
-                pdf.setTextColor(0, 0, 255); // Blue color for link
-                const devText = 'Developer: Kundan Yadav💀';
-                // Using textWithLink to make the text a clickable hyperlink
-                pdf.textWithLink(devText, pdf.internal.pageSize.width / 2, y, { url: 'https://t.me/kundan_yadav_bot', align: 'center' });
-                pdf.setTextColor(0, 0, 0); // Reset text color
+                pdf.setTextColor(0, 0, 255);
+                // **FIX**: Use a simple string for PDF compatibility as default fonts don't support special characters.
+                const devTextPDF = 'Developer: Kundan Yadav';
+                pdf.textWithLink(devTextPDF, pdf.internal.pageSize.width / 2, y, { url: 'https://t.me/kundan_yadav_bot', align: 'center' });
+                pdf.setTextColor(0, 0, 0);
                 y += 25;
 
                 // User Details (Left)
@@ -721,7 +666,6 @@
                 pdf.text(`Mobile: ${userMobile || 'N/A'}`, margin, y);
                 y += 20;
 
-                // Separator Line
                 pdf.setLineWidth(1.5);
                 pdf.line(margin, y, pdf.internal.pageSize.width - margin, y);
                 y += 30;
@@ -773,14 +717,14 @@
                         let prefix = `${String.fromCharCode(65 + i)}) ${opt_label}`;
                         
                         if (opt === correctOpt) {
-                            pdf.setTextColor(40, 167, 69); // Green for correct
+                            pdf.setTextColor(40, 167, 69);
                             prefix = (userAnswer === opt ? '✓ ' : '  ') + prefix;
                             pdf.text(prefix, margin + 15, y);
                         } else if (opt === userAnswer) {
-                            pdf.setTextColor(220, 53, 69); // Red for incorrect user choice
+                            pdf.setTextColor(220, 53, 69);
                             pdf.text(`✗ ${prefix}`, margin + 15, y);
                         } else {
-                            pdf.setTextColor(50, 50, 50); // Default for other options
+                            pdf.setTextColor(50, 50, 50);
                             pdf.text(`  ${prefix}`, margin + 15, y);
                         }
                         y += 15;
@@ -802,7 +746,7 @@
                     pdf.text(`Time Taken: ${minutes}m ${seconds}s`, pdf.internal.pageSize.width - margin, y, { align: 'right'});
                     y += 20;
                     
-                    pdf.setFillColor(240, 248, 255); // Light blue background for solution
+                    pdf.setFillColor(240, 248, 255);
                     const solutionLines = pdf.splitTextToSize(`Solution: ${q.solution_en}`, maxWidth - 20);
                     pdf.roundedRect(margin, y - 10, maxWidth, solutionLines.length * 12 + 15, 3, 3, 'F');
                     pdf.setTextColor(50, 50, 50);
@@ -816,7 +760,6 @@
                 console.error("Error generating PDF:", error);
                 alert("Sorry, there was an error generating the PDF.");
             } finally {
-                // Restore button state
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalContent;
             }
