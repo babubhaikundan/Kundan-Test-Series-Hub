@@ -35,7 +35,7 @@
     "subjects": {
       "gen_science": { "name": "General Science", "tests": [] },
       "gen_awareness": { "name": "General Awareness", "tests": [] },
-      "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning test 1", "file": "tests/1.json"}] },
+      "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning test 1", "file": "test-runner.html?test=1.json"}] },
       "maths": { "name": "Maths", "tests": [] },
       "hindi": { "name": "Hindi", "tests": [] },
       "english": { "name": "English", "tests": [] }
