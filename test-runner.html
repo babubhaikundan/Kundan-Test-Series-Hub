@@ -50,15 +50,19 @@
         /* --- Main Test UI: Header & Footer --- */
         .header{position:fixed;top:0;left:0;right:0;height:60px;background:var(--header-bg);color:#fff;display:flex;align-items:center;padding:0 16px;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.1)}
         .header-content{display:flex;justify-content:space-between;align-items:center;width:100%;gap:8px}
-        .header-brand{display:flex;align-items:center;font-weight:600;font-size:.9rem;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 0;min-width:0}
+        .header-brand{display:flex;align-items:center;font-weight:600;color:#fff;text-decoration:none;flex:1 1 0;min-width:0}
         .header-brand i{margin-right:8px;font-size:1.2rem;flex-shrink:0}
+        /* MODIFIED: Title styling to allow wrapping and reduce size */
+        .header-brand span { white-space: normal; line-height: 1.2; font-size: 0.85rem; }
+        
         .header-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
         .control-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);flex-shrink:0}
         .control-btn:hover{background:rgba(255,255,255,.2)}
-        .submit-btn-header{height:36px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);padding:0 12px;font-weight:500;font-size:.85rem;flex-shrink:0}
-        .submit-btn-header.submitted-state{padding:0;width:36px;background-color:var(--success);border-color:var(--success);cursor:default}
+        /* MODIFIED: Submit button made more compact */
+        .submit-btn-header{height:34px;padding:0 10px;font-size:0.8rem;border-radius:17px}
+        .submit-btn-header.submitted-state{padding:0;width:34px;background-color:var(--success);border-color:var(--success);cursor:default}
         .submit-btn-header:hover:not(.submitted-state){background:rgba(255,255,255,.25)}
-        .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 12px;font-size:.85rem;font-weight:500;display:flex;align-items:center;flex-shrink:0}
+        .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 10px;font-size:.8rem;font-weight:500;display:flex;align-items:center;flex-shrink:0}
         .timer-display i{margin-right:6px}
         
         .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:var(--footer-bg);box-shadow:0 -2px 10px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:800;transition:background-color .3s}
@@ -68,11 +72,11 @@
         .branding-link-mobile{text-decoration:none;font-weight:500;font-size:.75rem;line-height:1.3; color: var(--secondary);}
         .branding-link-mobile:hover{color: var(--primary);}
         
-        #inline-mark-btn { flex-grow: 1; margin: 0 8px; border-color: var(--secondary); color: var(--secondary); max-width: 150px; display: none; }
+        /* MODIFIED: Mark button styles adjusted for a more compact look */
+        #inline-mark-btn { height:44px; padding: 0 12px; font-size: 0.85rem; flex-grow: 1; margin: 0 8px; border-color: var(--secondary); color: var(--secondary); max-width: 130px; display: none; }
         #inline-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
-        #inline-mark-btn .fa-flag { transition: all 0.2s; }
         
-        #floating-mark-btn { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 850; display: none; background-color: var(--card-bg); border-color: var(--secondary); color: var(--secondary); box-shadow: 0 -2px 10px rgba(0,0,0,.1); }
+        #floating-mark-btn { height:44px; padding: 0 12px; font-size: 0.85rem; position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 850; display: none; background-color: var(--card-bg); border-color: var(--secondary); color: var(--secondary); box-shadow: 0 -2px 10px rgba(0,0,0,.1); }
         #floating-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
         
         .desktop-footer{position:fixed;bottom:0;left:0;right:320px;height:40px;background:var(--dark);color:#fff;align-items:center;justify-content:center;z-index:850;display:none}
@@ -145,7 +149,7 @@
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
         
-        @media (min-width:992px){.main-content{margin-right:320px}.question-nav{transform:translateX(0);bottom:40px}.bottom-nav{display:none}#floating-pdf-btn{right:340px;bottom:60px}}
+        @media (min-width:992px){.main-content{margin-right:320px}.question-nav{transform:translateX(0);bottom:40px}.bottom-nav{display:none}#floating-pdf-btn{right:340px;bottom:60px} #floating-mark-btn{display:none!important}}
         @media (max-width:991.98px){.desktop-footer{display:none!important}.question-nav{bottom:80px}}
     </style>
 </head>
@@ -182,7 +186,10 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <a href="https://t.me/kundan_yadav_bot" target="_blank" class="header-brand"><i class="fas fa-brain"></i><span id="header-title">Test</span></a>
+                <a href="https://t.me/kundan_yadav_bot" target="_blank" class="header-brand">
+                    <i class="fas fa-brain"></i>
+                    <span id="header-title">Test</span>
+                </a>
                 <div class="header-controls">
                     <div class="timer-display"><i class="far fa-clock"></i><span id="timer-display">00:00</span></div>
                     <button id="theme-toggle-btn" class="control-btn" onclick="toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></button>
@@ -264,10 +271,7 @@
         let totalTime = 0, timeSpent = {}, timerInterval, questionTimer, timeOnCurrentQuestion = 0;
         let markedForReview = {};
 
-        const backgroundImages = [
-            'https://s.tfrbot.com/h/r8dCRJ', 'https://s.tfrbot.com/h/sRMf7S',
-            'https://s.tfrbot.com/h/Vf6F3e', 'https://s.tfrbot.com/h/BEnHxJ'
-        ];
+        const backgroundImages = [ 'https://s.tfrbot.com/h/r8dCRJ', 'https://s.tfrbot.com/h/sRMf7S', 'https://s.tfrbot.com/h/Vf6F3e', 'https://s.tfrbot.com/h/BEnHxJ' ];
         
         // --- INITIALIZATION & EVENT LISTENERS ---
         window.onload = function() { 
@@ -380,7 +384,6 @@
             document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
             document.getElementById(`box-${index}`).classList.add('current');
             
-            // Handle branding and Mark button visibility
             const brandingContainer = document.querySelector('.branding-mobile-container');
             const inlineMarkBtn = document.getElementById('inline-mark-btn');
             const floatingMarkBtn = document.getElementById('floating-mark-btn');
@@ -422,24 +425,11 @@
             startQuestionTimer();
         }
 
-        function applyLanguage() {
-            document.querySelectorAll('.en').forEach(el => el.style.display = currentLang === 'en' ? 'block' : 'none');
-            document.querySelectorAll('.hi').forEach(el => el.style.display = currentLang === 'hi' ? 'block' : 'none');
-        }
-
-        function selectAnswer(qId, option) {
-            if (submitted) return;
-            answers[qId] = option;
-            updateProgress();
-            const box = document.getElementById(`box-${questions.findIndex(q => q.id === qId)}`);
-            box.classList.add('attempted');
-        }
-
+        function applyLanguage() { document.querySelectorAll('.en').forEach(el => el.style.display = currentLang === 'en' ? 'block' : 'none'); document.querySelectorAll('.hi').forEach(el => el.style.display = currentLang === 'hi' ? 'block' : 'none'); }
+        function selectAnswer(qId, option) { if (submitted) return; answers[qId] = option; updateProgress(); document.getElementById(`box-${questions.findIndex(q => q.id === qId)}`).classList.add('attempted'); }
         function prevQuestion() { if (currentQuestion > 0) showQuestion(currentQuestion - 1); }
         function nextQuestion() { if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1); }
-        
         function toggleLanguage(lang) { if (currentLang !== lang) { currentLang = lang; showQuestion(currentQuestion); } }
-        
         function toggleNav(show) { const nav = document.getElementById('question-nav'); const overlay = document.getElementById('nav-overlay'); if (show === undefined) show = !nav.classList.contains('show'); nav.classList.toggle('show', show); overlay.classList.toggle('show', show); if (window.innerWidth < 992) document.body.style.overflow = show ? 'hidden' : ''; }
         function updateProgress() { document.getElementById('attempted-count').textContent = Object.keys(answers).length; }
 
@@ -447,11 +437,7 @@
             const timerDisplay = document.getElementById('timer-display'); 
             let timeLeft = totalTime;
             timerInterval = setInterval(() => {
-                if (timeLeft <= 0 || submitted) { 
-                    clearInterval(timerInterval); 
-                    if (!submitted) submitTest(); 
-                    return; 
-                }
+                if (timeLeft <= 0 || submitted) { clearInterval(timerInterval); if (!submitted) submitTest(); return; }
                 timeLeft--;
                 const minutes = Math.floor((timeLeft % 3600) / 60);
                 const seconds = timeLeft % 60;
@@ -466,32 +452,20 @@
             markedForReview[qId] = !markedForReview[qId];
             updateMarkForReviewUI();
         }
-
         function updateMarkForReviewUI() {
             if (submitted) return;
             const qId = questions[currentQuestion].id;
             const isMarked = markedForReview[qId];
             const box = document.getElementById(`box-${currentQuestion}`);
             
-            // Update both buttons regardless of which is visible
             const buttonsToUpdate = [document.getElementById('inline-mark-btn'), document.getElementById('floating-mark-btn')];
-            
             buttonsToUpdate.forEach(btn => {
                 if (!btn) return;
                 const icon = btn.querySelector('i');
-                if (isMarked) {
-                    btn.classList.add('marked');
-                    icon.className = 'fas fa-flag';
-                } else {
-                    btn.classList.remove('marked');
-                    icon.className = 'far fa-flag';
-                }
+                if (isMarked) { btn.classList.add('marked'); icon.className = 'fas fa-flag'; } 
+                else { btn.classList.remove('marked'); icon.className = 'far fa-flag'; }
             });
-
-            if (box) {
-                if (isMarked) box.classList.add('marked');
-                else box.classList.remove('marked');
-            }
+            if (box) { if (isMarked) box.classList.add('marked'); else box.classList.remove('marked'); }
         }
         
         // --- SUBMISSION & RESULTS ---
