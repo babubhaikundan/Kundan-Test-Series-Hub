@@ -23,7 +23,7 @@
     "name": "SSC Non Tech Paper",
     "subjects": {
       "gen_science": { "name": "General Science", "tests": [] },
-      "gen_awareness": { "name": "General Awareness", "tests": [{ "name": "General Awareness", "file": "test-runner.html?test=General Awareness 1" }] },
+      "gen_awareness": { "name": "General Awareness", "tests": [{ "name": "General Awareness 1", "file": "test-runner.html?test=General Awareness 1" }] },
       "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning Test 1", "file": "tests/Reasoning 1.html" }] },
       "maths": { "name": "Maths", "tests": [{ "name": "Maths Test 1", "file": "tests/Math 1.html" }] },
       "hindi": { "name": "Hindi", "tests": [] },
