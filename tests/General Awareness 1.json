@@ -1,6 +1,5 @@
 {
-  "general_awareness": {
-    "title": "General Awareness",
+    "title": "General Awareness 1",
     "time": 25,
     "pos_marks": 1,
     "neg_marks": 0.25,
@@ -607,4 +606,3 @@
       }
     ]
   }
-      }
