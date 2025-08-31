@@ -30,7 +30,7 @@
      
   
       "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning Test 1", "file": "tests/Reasoning 1.html" },
-        {"name": "Reasoning 2022 1st Shift", "file": "test-runner.html?test/Reasoning SSC JE=Reasoning 2022 1st Shift"}] },
+        {"name": "Reasoning 2022 1st Shift", "file": "test-runner.html?test=Reasoning 2022 1st Shift"}] },
     
       
       "maths": { "name": "Maths", "tests": [{ "name": "Maths Test 1", "file": "tests/Math 1.html" }] },
