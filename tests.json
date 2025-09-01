@@ -63,15 +63,5 @@
       "hindi": { "name": "Hindi", "tests": [] },
       "english": { "name": "English", "tests": [] }
     }
-  },
-   
-  "SSB OIR": {
-    "name": "SSB OIR Exams",
-    "subjects": {
-      
-      "reasoning": { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"}] }
-      
-    }
-}
-}
-}
+  }
+   }
