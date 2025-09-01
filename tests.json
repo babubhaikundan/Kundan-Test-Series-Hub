@@ -64,7 +64,7 @@
       "english": { "name": "English", "tests": [] }
     }
   },
-   "railways": {
+   "helo": {
     "name": "Railway Exams (RRB)",
     "subjects": {
       "gen_science": { "name": "General Science", "tests": [] },
