@@ -64,15 +64,14 @@
       "english": { "name": "English", "tests": [] }
     }
   },
-   "helo": {
-    "name": "Railway Exams (RRB)",
+   "ssb_oir": {
+    "name": "SSB OIR Exams",
     "subjects": {
-      "gen_science": { "name": "General Science", "tests": [] },
-      "gen_awareness": { "name": "General Awareness", "tests": [] },
-      "reasoning": { "name": "Reasoning", "tests": [] },
-      "maths": { "name": "Maths", "tests": [] },
-      "hindi": { "name": "Hindi", "tests": [] },
-      "english": { "name": "English", "tests": [] }
+      
+      "reasoning": { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"}] }
+      
     }
-   }
-   }
+}
+  
+}
+  
