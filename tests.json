@@ -29,8 +29,13 @@
       "gen_awareness": { "name": "General Awareness", "tests": [{ "name": "General Awareness 1", "file": "test-runner.html?test=General Awareness 1" }] },
      
   
-      "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning Test 1", "file": "tests/Reasoning 1.html" },
-        {"name": "Reasoning 2022 1st Shift", "file": "test-runner.html?test=Reasoning SSC JE/Reasoning 2022 1st Shift"}] },
+      "reasoning": 
+        
+        { "name": "Reasoning", "tests": [{ "name": "Reasoning Test 1", "file": "tests/Reasoning 1.html" },
+        {"name": "Reasoning 2022 1st Shift", "file": "test-runner.html?test=Reasoning SSC JE/Reasoning 2022 1st Shift"}
+        
+        
+        ] },
     
       
       "maths": { "name": "Maths", "tests": [{ "name": "Maths Test 1", "file": "tests/Math 1.html" }] },
@@ -64,11 +69,19 @@
       "english": { "name": "English", "tests": [] }
     }
   },
+  
    "ssb_oir": {
     "name": "SSB OIR Exams",
     "subjects": {
       
-      "reasoning": { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"}] }
+      "reasoning": 
+      
+      { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"},
+      { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 2", "file": "test-runner.html?test=SSB OIR TEST/2"},
+      { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 3", "file": "test-runner.html?test=SSB OIR TEST/3"}
+      
+      
+      ] }
       
     }
 }
