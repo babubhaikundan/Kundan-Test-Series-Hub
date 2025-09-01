@@ -74,11 +74,11 @@
     "name": "SSB OIR Exams",
     "subjects": {
       
-      "reasoning": 
-      
-      { "name": "Reasoning (Verbal & Non Verbal)", "tests": [{ "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"},
-      { "name": "Reasoning (Verbal & Non Verbal)", "tests": { "name": "Test 2", "file": "test-runner.html?test=SSB OIR TEST/2"},
-      { "name": "Reasoning (Verbal & Non Verbal)", "tests": { "name": "Test 3", "file": "test-runner.html?test=SSB OIR TEST/3"}
+      "reasoning":  { "name": "Reasoning (Verbal & Non Verbal)", "tests": [
+        
+      { "name": "Test 1", "file": "test-runner.html?test=SSB OIR TEST/1"},
+      { "name": "Test 2", "file": "test-runner.html?test=SSB OIR TEST/2"},
+      { "name": "Test 3", "file": "test-runner.html?test=SSB OIR TEST/3"}
       
       
       ] }
