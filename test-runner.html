@@ -714,6 +714,7 @@
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
 
+                    
             // --- Show Loading Overlay ---
             const overlay = document.createElement('div');
             overlay.className = 'pdf-generating-overlay';
@@ -730,6 +731,9 @@
                 const doc = new jsPDF_lib({ unit: "pt", format: "a4", orientation: "portrait" });
                 const fileName = `${testTitle} Result by Kundan.pdf`;
 
+                // Check karo ki app ke andar hain ya browser mein
+const isAndroidApp = window.Android && typeof window.Android.saveBase64String === 'function';
+                
                 if (currentLang === 'hi') {
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
                     progressText.textContent = "Initializing Hindi PDF...";
@@ -803,7 +807,14 @@
                         document.body.removeChild(questionContainer);
                     }
                     
-                    doc.save(fileName);
+                    // Check karo ki app ke andar hain ya browser mein
+if (isAndroidApp) {
+    // Agar app mein hain, to Java function ko call karo
+    window.Android.saveBase64String(doc.output('datauristring'), fileName);
+} else {
+    // Agar browser mein hain, to purana download tareeka istemal karo
+    doc.save(fileName);
+}
 
                 } else {
                     // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
@@ -833,7 +844,14 @@
                         doc.roundedRect(a, s - 10, i, 12 * f_sol.length + 15, 3, 3, "F"); doc.setTextColor(50, 50, 50); doc.text(f_sol, a + 10, s); s += 12 * f_sol.length + 15;
                     });
                     
-                    doc.save(fileName);
+                    // Check karo ki app ke andar hain ya browser mein
+if (isAndroidApp) {
+    // Agar app mein hain, to Java function ko call karo
+    window.Android.saveBase64String(doc.output('datauristring'), fileName);
+} else {
+    // Agar browser mein hain, to purana download tareeka istemal karo
+    doc.save(fileName);
+}
                 }
 
             } catch (error) {
