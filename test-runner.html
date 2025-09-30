@@ -737,7 +737,9 @@ const isAndroidApp = window.Android && typeof window.Android.saveBase64String ==
                 if (currentLang === 'hi') {
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
                     progressText.textContent = "Initializing Hindi PDF...";
-                    
+               
+                    alert("DEBUGGING ALERT 1: Hindi PDF generation started.");
+                   
                     const pdfWidth = doc.internal.pageSize.getWidth();
                     const margin = 40;
                     let yPosition = margin;
@@ -755,7 +757,7 @@ const isAndroidApp = window.Android && typeof window.Android.saveBase64String ==
                     doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
                     yPosition += headerImgHeight + 20;
                     document.body.removeChild(headerContainer);
-
+alert("DEBUGGING ALERT 2: Header and summary added. Starting questions loop.");
                     // Loop through each question and render it
                     for (let i = 0; i < questions.length; i++) {
                         progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
@@ -806,9 +808,11 @@ const isAndroidApp = window.Android && typeof window.Android.saveBase64String ==
                         yPosition += qImgHeight;
                         document.body.removeChild(questionContainer);
                     }
-                    
+                    alert("DEBUGGING ALERT 3: All questions processed. Preparing to save.");
                     // Check karo ki app ke andar hain ya browser mein
 if (isAndroidApp) {
+
+    alert("DEBUGGING ALERT 4: Android App detected. Calling Java bridge.");
     // Agar app mein hain, to Java function ko call karo
     window.Android.saveBase64String(doc.output('datauristring'), fileName);
 } else {
