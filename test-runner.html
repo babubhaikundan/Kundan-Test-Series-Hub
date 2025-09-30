@@ -198,19 +198,6 @@
         @media (max-width:991.98px){.desktop-footer{display:none!important}.question-nav{bottom:80px}}
     </style>
 
-<!-- START: Yeh code Hindi Font ke liye hai -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
-<style>
-    /* Yeh style Hindi font ko har jagah apply karega */
-    body, h1, h2, h3, h4, p, div, span, li, button, input {
-        font-family: 'Noto Sans Devanagari', sans-serif !important;
-    }
-</style>
-<!-- END: Hindi Font ka code yahan khatam -->
-
-
     
 </head>
 <body class="welcome-mode">
@@ -823,6 +810,8 @@ alert("DEBUGGING ALERT 2: Header and summary added. Starting questions loop.");
                         yPosition += qImgHeight;
                         document.body.removeChild(questionContainer);
                     }
+                    // WebView ke UI Thread ko saans lene ka mauka dein
+await new Promise(resolve => setTimeout(resolve, 10)); 
                     alert("DEBUGGING ALERT 3: All questions processed. Preparing to save.");
                     // Check karo ki app ke andar hain ya browser mein
 if (isAndroidApp) {
