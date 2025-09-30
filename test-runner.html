@@ -730,6 +730,8 @@
                 const doc = new jsPDF_lib({ unit: "pt", format: "a4", orientation: "portrait" });
                 const fileName = `${testTitle} Result by Kundan.pdf`;
 
+const isAndroidApp = window.Android && typeof window.Android.startPdf === 'function';
+                
                 if (currentLang === 'hi') {
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
                     progressText.textContent = "Initializing Hindi PDF...";
@@ -803,7 +805,26 @@
                         document.body.removeChild(questionContainer);
                     }
                     
-                    doc.save(fileName);
+                    // Check karo ki app ke andar hain ya browser mein
+if (isAndroidApp) {
+    // App ke andar, data ko tukdon mein bhejo
+    progressText.textContent = "Saving to device...";
+    const pdfDataString = doc.output('datauristring');
+    const downloadId = `pdf_${Date.now()}`;
+    
+    window.Android.startPdf(downloadId, fileName);
+
+    const chunkSize = 16384; // 16KB ke tukde
+    for (let i = 0; i < pdfDataString.length; i += chunkSize) {
+        const chunk = pdfDataString.substring(i, i + chunkSize);
+        window.Android.appendPdfChunk(downloadId, chunk);
+    }
+    window.Android.finishPdf(downloadId);
+    
+} else {
+    // Agar normal browser mein hain, to purana tareeka istemal karo
+    doc.save(fileName);
+}
 
                 } else {
                     // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
