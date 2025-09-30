@@ -709,145 +709,126 @@
 
         //PDF DOWNLOADING FUNCTION 
 
-                async function downloadPDF(e) {
-            const btn = e;
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true;
+                
 
-            // --- Show Loading Overlay ---
-            const overlay = document.createElement('div');
-            overlay.className = 'pdf-generating-overlay';
-            overlay.innerHTML = `
-                <div class="spinner-border" role="status"></div>
-                <p>Generating PDF...</p>
-                <p id="pdf-progress-text" style="font-size: 0.9em;"></p>
-            `;
-            document.body.appendChild(overlay);
-            const progressText = document.getElementById('pdf-progress-text');
+async function downloadPDF(e) {
+    const btn = e;
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
 
-            try {
-                const { jsPDF: jsPDF_lib } = window.jspdf;
-                const doc = new jsPDF_lib({ unit: "pt", format: "a4", orientation: "portrait" });
-                const fileName = `${testTitle} Result by Kundan.pdf`;
+    const overlay = document.createElement('div');
+    overlay.className = 'pdf-generating-overlay';
+    overlay.innerHTML = `<div class="spinner-border" role="status"></div><p>Generating PDF...</p><p id="pdf-progress-text" style="font-size: 0.9em;"></p>`;
+    document.body.appendChild(overlay);
+    const progressText = document.getElementById('pdf-progress-text');
 
-                if (currentLang === 'hi') {
-                    // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
-                    progressText.textContent = "Initializing Hindi PDF...";
-                    
-                    const pdfWidth = doc.internal.pageSize.getWidth();
-                    const margin = 40;
-                    let yPosition = margin;
+    try {
+        const {
+            jsPDF: jsPDF_lib
+        } = window.jspdf;
+        const doc = new jsPDF_lib({
+            unit: "pt",
+            format: "a4",
+            orientation: "portrait"
+        });
+        const fileName = `${testTitle} Result by Kundan.pdf`;
+        const isAndroidApp = window.Android && typeof window.Android.startPdf === 'function';
 
-                    // Render Header and Stats First
-                    progressText.textContent = "Processing summary...";
-                    const headerContainer = document.createElement('div');
-                    headerContainer.style.width = '700px'; headerContainer.style.padding = '20px'; headerContainer.style.background = '#fff'; headerContainer.style.color = '#000';
-                    let headerHTML = `<div style="text-align:center;"><h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr><p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p></div><hr><div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;"><div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div><div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div><div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div><div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div></div><div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
-                    headerContainer.innerHTML = headerHTML;
-                    document.body.appendChild(headerContainer);
-                    const headerCanvas = await html2canvas(headerContainer, { scale: 2 });
-                    const headerImgData = headerCanvas.toDataURL('image/png');
-                    const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
-                    doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
-                    yPosition += headerImgHeight + 20;
-                    document.body.removeChild(headerContainer);
-
-                    // Loop through each question and render it
-                    for (let i = 0; i < questions.length; i++) {
-                        progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
-                        const q = questions[i];
-                        const questionContainer = document.createElement('div');
-                        questionContainer.style.width = '700px'; questionContainer.style.padding = '20px'; questionContainer.style.background = '#fff'; questionContainer.style.color = '#000';
-                        
-                        const questionText = q.question_hi || q.question_en;
-                        const solutionText = q.solution_hi || q.solution_en;
-                        const optionsArray = q.options_hi || q.options_en;
-                                                let optionsHTML = '';
-                        const userAnswer = answers[q.id];
-                        const correctAnswer = q.correct;
-                        const optionKeys = ['a', 'b', 'c', 'd'];
-
-                        optionsArray.forEach((opt, idx) => {
-                            const optionKey = optionKeys[idx];
-                            let style = 'margin:5px 0; font-family: sans-serif;';
-                            let prefix = `${String.fromCharCode(65 + idx)}) `;
-
-                            if (optionKey === correctAnswer) {
-                                // This is the correct answer
-                                style += ' color: green; font-weight: bold;';
-                                if (userAnswer === optionKey) {
-                                    prefix = `✓ ${prefix}`; // User answered correctly
-                                }
-                            } else if (optionKey === userAnswer) {
-                                // This is the incorrect answer selected by the user
-                                style += ' color: red;';
-                                prefix = `✗ ${prefix}`;
-                            }
-                            
-                            optionsHTML += `<p style="${style}">${prefix}${opt}</p>`;
-                        });           
-                        const status = answers[q.id] ? (answers[q.id] === q.correct ? "Correct" : "Incorrect") : "Unattempted";
-                        const time = timeSpent[q.id] || 0;
-                        const minutes = Math.floor(time / 60); const seconds = time % 60;
-                        const timeTakenText = `${minutes}m ${seconds}s`;
-
-                        questionContainer.innerHTML = `<hr><div style="font-family: sans-serif; overflow: hidden;"><h4>Q${i + 1}: ${questionText}</h4>${optionsHTML}<p><strong>Status:</strong> ${status} <span style="float: right; color: #555; font-size: 0.9em;">Time Taken: ${timeTakenText}</span></p><div style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top: 10px;"><strong>Solution:</strong> ${solutionText}</div></div>`;
-                        
-                        document.body.appendChild(questionContainer);
-                        const qCanvas = await html2canvas(questionContainer, { scale: 2 });
-                        const qImgData = qCanvas.toDataURL('image/png');
-                        const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
-                        if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); yPosition = margin; }
-                        doc.addImage(qImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, qImgHeight);
-                        yPosition += qImgHeight;
-                        document.body.removeChild(questionContainer);
-                    }
-                    
-                    doc.save(fileName);
-
-                } else {
-                    // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
-                    progressText.textContent = "Processing English PDF...";
-                    let s = 40;
-                    const a = 40, i = doc.internal.pageSize.width - 2 * a, l = () => { doc.addPage(); s = a; };
-                    doc.setFont("Helvetica", "bold"); doc.setFontSize(18); doc.text(`Test Analysis: ${testTitle}`, doc.internal.pageSize.width / 2, s, { align: "center" }); s += 25;
-                    doc.setFont("Helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 84, 166); const d_dev = "Developer: Kundan Yadav"; doc.textWithLink(d_dev, doc.internal.pageSize.width / 2, s, { url: "https://t.me/kundan_yadav_bot", align: "center" });
-                    doc.setFont("Helvetica", "normal"); doc.setTextColor(0, 0, 0); s += 25;
-                    doc.setFontSize(12); doc.text(`User: ${userName || "N/A"}`, a, s); s += 15; doc.text(`Mobile: ${userMobile || "N/A"}`, a, s); s += 20;
-                    doc.setLineWidth(1.5); doc.line(a, s, doc.internal.pageSize.width - a, s); s += 30;
-                    doc.setFontSize(10); const r_rect = (i - 30) / 4, c_rect = 50;
-                    [{ label: "Score", value: document.getElementById("score-value").textContent, color: [0, 123, 255] }, { label: "Correct", value: document.getElementById("correct-value").textContent, color: [40, 167, 69] }, { label: "Incorrect", value: document.getElementById("incorrect-value").textContent, color: [220, 53, 69] }, { label: "Unattempted", value: document.getElementById("unattempted-value").textContent, color: [108, 117, 125] }].forEach((item, t) => { doc.setFillColor(item.color[0], item.color[1], item.color[2]); doc.roundedRect(a + t * (r_rect + 10), s, r_rect, c_rect, 5, 5, "F"); doc.setTextColor(255, 255, 255); doc.setFont("Helvetica", "bold"); doc.setFontSize(16); doc.text(item.value, a + t * (r_rect + 10) + r_rect / 2, s + 25, { align: "center" }); doc.setFont("Helvetica", "normal"); doc.setFontSize(10); doc.text(item.label, a + t * (r_rect + 10) + r_rect / 2, s + 40, { align: "center" }); });
-                    s += c_rect + 30; const chartCanvas = document.getElementById("topicAnalysisChart"); const chartImage = chartCanvas.toDataURL("image/png", 1.0); doc.addImage(chartImage, "PNG", a, s, i, i / 2); s += i / 2 + 30;
-                    doc.setTextColor(0, 0, 0);
-
-                    questions.forEach((e, t) => {
-                        if (s > doc.internal.pageSize.height - 150) l();
-                        doc.setLineWidth(.5); doc.line(a, s, doc.internal.pageSize.width - a, s); s += 20;
-                        const questionText = e.question_en || "";
-                        doc.setFont("Helvetica", "bold"); doc.setFontSize(11); const o_qText = doc.splitTextToSize(`Q${t + 1}: ${questionText.replace(/\n/g, " ")}`, i); doc.text(o_qText, a, s); s += 12 * o_qText.length + 10;
-                        doc.setFont("Helvetica", "normal"); doc.setFontSize(10); const d_opts = ["a", "b", "c", "d"]; const optionsArray = e.options_en || [];
-                        (optionsArray).forEach((optText, o_idx) => { const i_ans = answers[e.id], l_correct = e.correct, r_opt = d_opts[o_idx]; let c_text = `${String.fromCharCode(65 + o_idx)}) ${optText}`; if (r_opt === l_correct) { doc.setTextColor(40, 167, 69); c_text = (i_ans === r_opt ? "✓ " : "  ") + c_text; } else if (r_opt === i_ans) { doc.setTextColor(220, 53, 69); c_text = `✗ ${c_text}`; } else { doc.setTextColor(50, 50, 50); c_text = `  ${c_text}`; } doc.text(c_text, a + 15, s); s += 15 });
-                        doc.setTextColor(0, 0, 0); const c_time = timeSpent[e.id] || 0, m_min = Math.floor(c_time / 60), u_sec = c_time % 60; let g_status = answers[e.id] ? answers[e.id] === e.correct ? "Correct" : "Incorrect" : "Unattempted"; let h_color = answers[e.id] ? answers[e.id] === e.correct ? [40, 167, 69] : [220, 53, 69] : [108, 117, 125];
-                        doc.setFont("Helvetica", "bold"); doc.setTextColor(h_color[0], h_color[1], h_color[2]); doc.text(`Status: ${g_status}`, a, s); doc.setFont("Helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(108, 117, 125); doc.text(`Time Taken: ${m_min}m ${u_sec}s`, doc.internal.pageSize.width - a, s, { align: "right" }); s += 20;
-                        doc.setFillColor(240, 248, 255); const solutionText = e.solution_en || ""; const f_sol = doc.splitTextToSize(`Solution: ${solutionText}`, i - 20);
-                        doc.roundedRect(a, s - 10, i, 12 * f_sol.length + 15, 3, 3, "F"); doc.setTextColor(50, 50, 50); doc.text(f_sol, a + 10, s); s += 12 * f_sol.length + 15;
-                    });
-                    
-                    doc.save(fileName);
+        // ===================================================================
+        // === YEH HAI FINAL FIX - HYBRID STREAMING METHOD ===
+        // ===================================================================
+        
+        // Helper function to save PDF in app
+        const saveInApp = (pdfDoc) => {
+            progressText.textContent = "Saving to device...";
+            setTimeout(() => { // UI ko freeze hone se bachane ke liye
+                const pdfDataString = pdfDoc.output('datauristring');
+                
+                // English (choti file) ke liye direct save
+                if (currentLang !== 'hi' && pdfDataString.length < 2000000) { // 2MB se choti file
+                    window.Android.saveBase64String(pdfDataString, fileName);
+                    return;
                 }
 
-            } catch (error) {
-                console.error("Error generating PDF:", error);
-                alert("Sorry, there was an error generating the PDF.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
-                // --- Hide Loading Overlay ---
-                if (overlay) {
-                    document.body.removeChild(overlay);
+                // Hindi (badi file) ke liye streaming
+                const pureBase64 = pdfDataString.split(',')[1];
+                const downloadId = `pdf_${Date.now()}`;
+                window.Android.startPdf(downloadId, fileName);
+                const chunkSize = 16384;
+                for (let i = 0; i < pureBase64.length; i += chunkSize) {
+                    const chunk = pureBase64.substring(i, i + chunkSize);
+                    window.Android.appendPdfChunk(downloadId, chunk);
                 }
+                window.Android.finishPdf(downloadId);
+            }, 50);
+        };
+
+        if (currentLang === 'hi') {
+            // Hindi PDF logic (html2canvas)...
+            progressText.textContent = "Initializing Hindi PDF...";
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const margin = 40;
+            let yPosition = margin;
+            // Baaki ka header aur for loop ka code waisa hi hai...
+            const headerContainer = document.createElement('div');
+            headerContainer.style.width = '700px'; headerContainer.style.padding = '20px'; headerContainer.style.background = '#fff'; headerContainer.style.color = '#000';
+            let headerHTML = `<div style="text-align:center;"><h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr><p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p></div><hr><div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;"><div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div><div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div><div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div><div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div></div><div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
+            headerContainer.innerHTML = headerHTML;
+            document.body.appendChild(headerContainer);
+            const headerCanvas = await html2canvas(headerContainer, { scale: 1 });
+            const headerImgData = headerCanvas.toDataURL('image/png');
+            const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
+            doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
+            yPosition += headerImgHeight + 20;
+            document.body.removeChild(headerContainer);
+            for (let i = 0; i < questions.length; i++) {
+                progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
+                const q = questions[i];
+                const questionContainer = document.createElement('div');
+                questionContainer.style.width = '700px'; questionContainer.style.padding = '20px'; questionContainer.style.background = '#fff'; questionContainer.style.color = '#000';
+                const questionText = q.question_hi || q.question_en; const solutionText = q.solution_hi || q.solution_en; const optionsArray = q.options_hi || q.options_en;
+                let optionsHTML = ''; const userAnswer = answers[q.id]; const correctAnswer = q.correct; const optionKeys = ['a', 'b', 'c', 'd'];
+                optionsArray.forEach((opt, idx) => { const optionKey = optionKeys[idx]; let style = 'margin:5px 0; font-family: sans-serif;'; let prefix = `${String.fromCharCode(65 + idx)}) `; if (optionKey === correctAnswer) { style += ' color: green; font-weight: bold;'; if (userAnswer === optionKey) { prefix = `✓ ${prefix}`; } } else if (optionKey === userAnswer) { style += ' color: red;'; prefix = `✗ ${prefix}`; } optionsHTML += `<p style="${style}">${prefix}${opt}</p>`; });
+                const status = answers[q.id] ? (answers[q.id] === q.correct ? "Correct" : "Incorrect") : "Unattempted";
+                const time = timeSpent[q.id] || 0; const minutes = Math.floor(time / 60); const seconds = time % 60; const timeTakenText = `${minutes}m ${seconds}s`;
+                questionContainer.innerHTML = `<hr><div style="font-family: sans-serif; overflow: hidden;"><h4>Q${i + 1}: ${questionText}</h4>${optionsHTML}<p><strong>Status:</strong> ${status} <span style="float: right; color: #555; font-size: 0.9em;">Time Taken: ${timeTakenText}</span></p><div style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top: 10px;"><strong>Solution:</strong> ${solutionText}</div></div>`;
+                document.body.appendChild(questionContainer);
+                const qCanvas = await html2canvas(questionContainer, { scale: 1 });
+                const qImgData = qCanvas.toDataURL('image/png'); const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
+                if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); yPosition = margin; }
+                doc.addImage(qImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, qImgHeight);
+                yPosition += qImgHeight;
+                document.body.removeChild(questionContainer);
+                await new Promise(resolve => setTimeout(resolve, 10));
             }
-                }
+            if (isAndroidApp) { saveInApp(doc); } else { doc.save(fileName); }
+        } else {
+            // English PDF logic...
+            progressText.textContent = "Processing English PDF...";
+            let s = 40; const a = 40, i = doc.internal.pageSize.width - 2 * a, l = () => { doc.addPage(); s = a; };
+            doc.setFont("Helvetica", "bold"); doc.setFontSize(18); doc.text(`Test Analysis: ${testTitle}`, doc.internal.pageSize.width / 2, s, { align: "center" });
+            s += 25; doc.setFont("Helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 84, 166); const d_dev = "Developer: Kundan Yadav";
+            doc.textWithLink(d_dev, doc.internal.pageSize.width / 2, s, { url: "https://t.me/kundan_yadav_bot", align: "center" });
+            doc.setFont("Helvetica", "normal"); doc.setTextColor(0, 0, 0); s += 25; doc.setFontSize(12); doc.text(`User: ${userName || "N/A"}`, a, s);
+            s += 15; doc.text(`Mobile: ${userMobile || "N/A"}`, a, s); s += 20; doc.setLineWidth(1.5); doc.line(a, s, doc.internal.pageSize.width - a, s);
+            s += 30; doc.setFontSize(10); const r_rect = (i - 30) / 4, c_rect = 50;
+            [{ label: "Score", value: document.getElementById("score-value").textContent, color: [0, 123, 255] }, { label: "Correct", value: document.getElementById("correct-value").textContent, color: [40, 167, 69] }, { label: "Incorrect", value: document.getElementById("incorrect-value").textContent, color: [220, 53, 69] }, { label: "Unattempted", value: document.getElementById("unattempted-value").textContent, color: [108, 117, 125] }].forEach((item, t) => { doc.setFillColor(item.color[0], item.color[1], item.color[2]); doc.roundedRect(a + t * (r_rect + 10), s, r_rect, c_rect, 5, 5, "F"); doc.setTextColor(255, 255, 255); doc.setFont("Helvetica", "bold"); doc.setFontSize(16); doc.text(item.value, a + t * (r_rect + 10) + r_rect / 2, s + 25, { align: "center" }); doc.setFont("Helvetica", "normal"); doc.setFontSize(10); doc.text(item.label, a + t * (r_rect + 10) + r_rect / 2, s + 40, { align: "center" }); });
+            s += c_rect + 30; const chartCanvas = document.getElementById("topicAnalysisChart"); const chartImage = chartCanvas.toDataURL("image/png", 1.0);
+            doc.addImage(chartImage, "PNG", a, s, i, i / 2); s += i / 2 + 30; doc.setTextColor(0, 0, 0);
+            questions.forEach((e, t) => { if (s > doc.internal.pageSize.height - 150) l(); doc.setLineWidth(.5); doc.line(a, s, doc.internal.pageSize.width - a, s); s += 20; const questionText = e.question_en || ""; doc.setFont("Helvetica", "bold"); doc.setFontSize(11); const o_qText = doc.splitTextToSize(`Q${t + 1}: ${questionText.replace(/\n/g, " ")}`, i); doc.text(o_qText, a, s); s += 12 * o_qText.length + 10; doc.setFont("Helvetica", "normal"); doc.setFontSize(10); const d_opts = ["a", "b", "c", "d"]; const optionsArray = e.options_en || []; (optionsArray).forEach((optText, o_idx) => { const i_ans = answers[e.id], l_correct = e.correct, r_opt = d_opts[o_idx]; let c_text = `${String.fromCharCode(65 + o_idx)}) ${optText}`; if (r_opt === l_correct) { doc.setTextColor(40, 167, 69); c_text = (i_ans === r_opt ? "✓ " : "  ") + c_text; } else if (r_opt === i_ans) { doc.setTextColor(220, 53, 69); c_text = `✗ ${c_text}`; } else { doc.setTextColor(50, 50, 50); c_text = `  ${c_text}`; } doc.text(c_text, a + 15, s); s += 15 }); doc.setTextColor(0, 0, 0); const c_time = timeSpent[e.id] || 0, m_min = Math.floor(c_time / 60), u_sec = c_time % 60; let g_status = answers[e.id] ? answers[e.id] === e.correct ? "Correct" : "Incorrect" : "Unattempted"; let h_color = answers[e.id] ? answers[e.id] === e.correct ? [40, 167, 69] : [220, 53, 69] : [108, 117, 125]; doc.setFont("Helvetica", "bold"); doc.setTextColor(h_color[0], h_color[1], h_color[2]); doc.text(`Status: ${g_status}`, a, s); doc.setFont("Helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(108, 117, 125); doc.text(`Time Taken: ${m_min}m ${u_sec}s`, doc.internal.pageSize.width - a, s, { align: "right" }); s += 20; doc.setFillColor(240, 248, 255); const solutionText = e.solution_en || ""; const f_sol = doc.splitTextToSize(`Solution: ${solutionText}`, i - 20); doc.roundedRect(a, s - 10, i, 12 * f_sol.length + 15, 3, 3, "F"); doc.setTextColor(50, 50, 50); doc.text(f_sol, a + 10, s); s += 12 * f_sol.length + 15; });
+            if (isAndroidApp) { saveInApp(doc); } else { doc.save(fileName); }
+        }
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        alert("Sorry, there was an error generating the PDF.");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        if (overlay) {
+            document.body.removeChild(overlay);
+        }
+    }
+                                                                                                                                                                                                                                                                                                                        }
 
                 
     </script>
