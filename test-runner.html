@@ -807,19 +807,23 @@ const isAndroidApp = window.Android && typeof window.Android.startPdf === 'funct
                     }
                     
                     // Check karo ki app ke andar hain ya browser mein
+// Check karo ki app ke andar hain ya browser mein
 if (isAndroidApp) {
-    // Hindi (badi file) ke liye CHUNKING wala tareeka
     progressText.textContent = "Saving to device...";
-    const pdfDataString = doc.output('datauristring');
-    const downloadId = `pdf_${Date.now()}`;
-    window.Android.startPdf(downloadId, fileName);
-    const chunkSize = 16384;
-    for (let i = 0; i < pdfDataString.length; i += chunkSize) {
-        const chunk = pdfDataString.substring(i, i + chunkSize);
-        window.Android.appendPdfChunk(downloadId, chunk);
-    }
-    window.Android.finishPdf(downloadId);
+    // YEH HAI ASLI FIX: Bhaari kaam ko setTimeout mein daal do
+    setTimeout(() => {
+        const pdfDataString = doc.output('datauristring');
+        const downloadId = `pdf_${Date.now()}`;
+        window.Android.startPdf(downloadId, fileName);
+        const chunkSize = 16384;
+        for (let i = 0; i < pdfDataString.length; i += chunkSize) {
+            const chunk = pdfDataString.substring(i, i + chunkSize);
+            window.Android.appendPdfChunk(downloadId, chunk);
+        }
+        window.Android.finishPdf(downloadId);
+    }, 50); // 50 millisecond ka delay taaki UI freeze na ho
 } else {
+    // Browser ke liye
     doc.save(fileName);
 }
                 } else {
