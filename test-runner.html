@@ -733,6 +733,8 @@
                 const doc = new jsPDF_lib({ unit: "pt", format: "a4", orientation: "portrait" });
                 const fileName = `${testTitle} Result by Kundan.pdf`;
 
+const isAndroidApp = window.Android && typeof window.Android.startPdf === 'function';
+                
                 // Check karo ki app ke andar hain ya browser mein
 const isAndroidApp = window.Android && typeof window.Android.saveBase64String === 'function';
                 
@@ -740,8 +742,7 @@ const isAndroidApp = window.Android && typeof window.Android.saveBase64String ==
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
                     progressText.textContent = "Initializing Hindi PDF...";
                
-                    alert("DEBUGGING ALERT 1: Hindi PDF generation started.");
-                   
+                    
                     const pdfWidth = doc.internal.pageSize.getWidth();
                     const margin = 40;
                     let yPosition = margin;
@@ -759,7 +760,7 @@ const isAndroidApp = window.Android && typeof window.Android.saveBase64String ==
                     doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
                     yPosition += headerImgHeight + 20;
                     document.body.removeChild(headerContainer);
-alert("DEBUGGING ALERT 2: Header and summary added. Starting questions loop.");
+
                     // Loop through each question and render it
                     for (let i = 0; i < questions.length; i++) {
                         progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
@@ -812,15 +813,35 @@ alert("DEBUGGING ALERT 2: Header and summary added. Starting questions loop.");
                     }
                     // WebView ke UI Thread ko saans lene ka mauka dein
 await new Promise(resolve => setTimeout(resolve, 10)); 
-                    alert("DEBUGGING ALERT 3: All questions processed. Preparing to save.");
+                    
                     // Check karo ki app ke andar hain ya browser mein
+// ===================================================================
+// === YEH HAI FINAL FIX - TUKDON MEIN DATA BHEJNA ===
+// ===================================================================
 if (isAndroidApp) {
+    // App ke andar, data ko tukdon mein bhejo
+    progressText.textContent = "Saving to device...";
+    const pdfDataString = doc.output('datauristring');
+    
+    // Har download ke liye ek unique ID banate hain
+    const downloadId = `pdf_${Date.now()}`;
+    
+    // Java ko batao ki ek nayi file shuru ho rahi hai
+    window.Android.startPdf(downloadId, fileName);
 
-    alert("DEBUGGING ALERT 4: Android App detected. Calling Java bridge.");
-    // Agar app mein hain, to Java function ko call karo
-    window.Android.saveBase64String(doc.output('datauristring'), fileName);
+    const chunkSize = 16384; // 16KB ke tukde, yeh safe size hai
+    
+    // Poore data ko chote-chote tukdon mein kaat kar bhejo
+    for (let i = 0; i < pdfDataString.length; i += chunkSize) {
+        const chunk = pdfDataString.substring(i, i + chunkSize);
+        window.Android.appendPdfChunk(downloadId, chunk);
+    }
+    
+    // Java ko batao ki saare tukde bhej diye hain, ab file bana do
+    window.Android.finishPdf(downloadId);
+    
 } else {
-    // Agar browser mein hain, to purana download tareeka istemal karo
+    // Agar normal browser mein hain, to purana tareeka istemal karo
     doc.save(fileName);
 }
 
