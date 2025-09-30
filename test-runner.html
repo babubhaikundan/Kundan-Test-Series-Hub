@@ -731,7 +731,8 @@
                 const fileName = `${testTitle} Result by Kundan.pdf`;
 
 const isAndroidApp = window.Android && typeof window.Android.startPdf === 'function';
-                
+
+            
                 if (currentLang === 'hi') {
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
                     progressText.textContent = "Initializing Hindi PDF...";
@@ -807,25 +808,20 @@ const isAndroidApp = window.Android && typeof window.Android.startPdf === 'funct
                     
                     // Check karo ki app ke andar hain ya browser mein
 if (isAndroidApp) {
-    // App ke andar, data ko tukdon mein bhejo
+    // Hindi (badi file) ke liye CHUNKING wala tareeka
     progressText.textContent = "Saving to device...";
     const pdfDataString = doc.output('datauristring');
     const downloadId = `pdf_${Date.now()}`;
-    
     window.Android.startPdf(downloadId, fileName);
-
-    const chunkSize = 16384; // 16KB ke tukde
+    const chunkSize = 16384;
     for (let i = 0; i < pdfDataString.length; i += chunkSize) {
         const chunk = pdfDataString.substring(i, i + chunkSize);
         window.Android.appendPdfChunk(downloadId, chunk);
     }
     window.Android.finishPdf(downloadId);
-    
 } else {
-    // Agar normal browser mein hain, to purana tareeka istemal karo
     doc.save(fileName);
 }
-
                 } else {
                     // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
                     progressText.textContent = "Processing English PDF...";
@@ -856,10 +852,11 @@ if (isAndroidApp) {
                     
                     // Check karo ki app ke andar hain ya browser mein
 if (isAndroidApp) {
-    // Agar app mein hain, to Java function ko call karo
-    window.Android.saveBase64String(doc.output('datauristring'), fileName);
+    // English (choti file) ke liye SIMPLE wala tareeka
+    progressText.textContent = "Saving to device...";
+    const pdfDataString = doc.output('datauristring');
+    window.Android.saveBase64String(pdfDataString, fileName);
 } else {
-    // Agar browser mein hain, to purana download tareeka istemal karo
     doc.save(fileName);
 }
                 }
