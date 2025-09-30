@@ -833,7 +833,14 @@
                         doc.roundedRect(a, s - 10, i, 12 * f_sol.length + 15, 3, 3, "F"); doc.setTextColor(50, 50, 50); doc.text(f_sol, a + 10, s); s += 12 * f_sol.length + 15;
                     });
                     
-                    doc.save(fileName);
+                    // Check karo ki app ke andar hain ya browser mein
+if (isAndroidApp) {
+    // Agar app mein hain, to Java function ko call karo
+    window.Android.saveBase64String(doc.output('datauristring'), fileName);
+} else {
+    // Agar browser mein hain, to purana download tareeka istemal karo
+    doc.save(fileName);
+}
                 }
 
             } catch (error) {
