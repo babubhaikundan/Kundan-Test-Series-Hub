@@ -781,6 +781,10 @@ async function downloadPDF(e) {
             doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
             yPosition += headerImgHeight + 20;
             document.body.removeChild(headerContainer);
+
+            // WebView ke UI Thread ko saans lene ka mauka dein taaki woh crash na ho
+await new Promise(resolve => setTimeout(resolve, 10));
+            
             for (let i = 0; i < questions.length; i++) {
                 progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
                 const q = questions[i];
