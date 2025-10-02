@@ -775,7 +775,7 @@ async function downloadPDF(e) {
             let headerHTML = `<div style="text-align:center;"><h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr><p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p></div><hr><div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;"><div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div><div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div><div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div><div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div></div><div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
             headerContainer.innerHTML = headerHTML;
             document.body.appendChild(headerContainer);
-            const headerCanvas = await html2canvas(headerContainer, { scale: 1 });
+            const headerCanvas = await html2canvas(headerContainer, { scale: 2 });
             const headerImgData = headerCanvas.toDataURL('image/png');
             const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
             doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
@@ -793,7 +793,7 @@ async function downloadPDF(e) {
                 const time = timeSpent[q.id] || 0; const minutes = Math.floor(time / 60); const seconds = time % 60; const timeTakenText = `${minutes}m ${seconds}s`;
                 questionContainer.innerHTML = `<hr><div style="font-family: sans-serif; overflow: hidden;"><h4>Q${i + 1}: ${questionText}</h4>${optionsHTML}<p><strong>Status:</strong> ${status} <span style="float: right; color: #555; font-size: 0.9em;">Time Taken: ${timeTakenText}</span></p><div style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top: 10px;"><strong>Solution:</strong> ${solutionText}</div></div>`;
                 document.body.appendChild(questionContainer);
-                const qCanvas = await html2canvas(questionContainer, { scale: 1 });
+                const qCanvas = await html2canvas(questionContainer, { scale: 2 });
                 const qImgData = qCanvas.toDataURL('image/png'); const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
                 if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); yPosition = margin; }
                 doc.addImage(qImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, qImgHeight);
