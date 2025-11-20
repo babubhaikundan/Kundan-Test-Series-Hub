@@ -14,13 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         /* ==================== Root Variables & Dark Mode ==================== */
-        /* Theme colors aur variables define kiye gaye hain */
         :root{--primary:#007bff;--primary-light:#52a4ff;--primary-dark:#0056b3;--secondary:#6c757d;--accent:#ffc107;--success:#28a745;--danger:#dc3545;--light:#f8f9fa;--dark:#343a40;--gray:#6c757d;--light-gray:#dfe6e9;--card-bg:#fff;--body-bg:#f4f7fe;--header-bg:linear-gradient(135deg,var(--primary),var(--primary-dark));--footer-bg:#fff;--box-shadow:0 4px 20px rgba(0,0,0,.08);--transition:all .3s cubic-bezier(.25,.8,.25,1)}
         
-        /* Dark mode ke liye colors override */
+        /* Dark mode colors override */
         body.dark-mode{--primary:#3498db; --light:#2c3e50;--dark:#ecf0f1;--gray:#95a5a6;--light-gray:#34495e;--card-bg:#1e272e;--body-bg:#141d26;--footer-bg:#1e272e;--box-shadow:0 4px 20px rgba(0,0,0,.3);--accent:#f1c40f}
         body.dark-mode .header {background: linear-gradient(135deg, var(--primary), #2980b9);}
         body.dark-mode .nav-btn {border-color: var(--primary);color: var(--primary);}
@@ -31,15 +32,15 @@
         body.dark-mode .results-card{background:var(--card-bg)}
         body.dark-mode #user-details-modal .user-details-card .form-control{background-color:#34495e;color:#ecf0f1;border-color:#566573}
         body.dark-mode #user-details-modal .user-details-card .form-control::placeholder{color:#95a5a6}
+        body.dark-mode .filter-btn{background:var(--light-gray);color:var(--dark)}
+        body.dark-mode .filter-btn.active{background:var(--primary);color:#fff}
         
         /* ==================== Global & Body Styles ==================== */
-        /* Basic styling for body and elements */
         *{-webkit-tap-highlight-color:transparent}
         body{background-color:var(--body-bg);font-family:Poppins,'Noto Sans Devanagari',sans-serif;color:var(--dark);line-height:1.6;overflow-x:hidden;transition:background-color .3s,color .3s}
         body:not(.welcome-mode){padding-top:60px;padding-bottom:80px}
 
         /* ==================== Welcome Screen ==================== */
-        /* Welcome screen jab user test load karta hai */
         #welcome-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden;background-size:cover;background-position:center center}
         #welcome-screen::before{content:'';position:absolute;top:-10px;left:-10px;right:-10px;bottom:-10px;z-index:-1;background:linear-gradient(rgba(29,36,47,.7),rgba(29,36,47,.7));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
         .welcome-card{background:rgba(255,255,255,.1);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:32px;width:100%;max-width:500px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);animation:fadeInUp .8s cubic-bezier(.25,.8,.25,1) forwards}
@@ -57,8 +58,44 @@
         #start-test-btn{width:100%;padding:14px;font-size:1.1rem;font-weight:600;border-radius:12px;animation:pulse 2s infinite}
         @keyframes pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,.4)}70%{transform:scale(1.02);box-shadow:0 0 0 10px rgba(0,123,255,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,0)}}
         
+        /* ==================== Toast Notification ==================== */
+        .toast-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast-notification i {
+            font-size: 1.1rem;
+        }
+        .toast-notification.success {
+            background: var(--success);
+        }
+        .toast-notification.error {
+            background: var(--danger);
+        }
+        .toast-notification.warning {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
         /* ==================== Main Test UI: Header & Footer ==================== */
-        /* Header - Top navigation bar */
         .header{position:fixed;top:0;left:0;right:0;height:60px;background:var(--header-bg);color:#fff;display:flex;align-items:center;padding:0 16px;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.1)}
         .header-content{display:flex;justify-content:space-between;align-items:center;width:100%;gap:8px}
         .header-brand{display:flex;align-items:center;font-weight:600;color:#fff;text-decoration:none;flex:1 1 0;min-width:0}
@@ -67,12 +104,13 @@
         .header-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
         .control-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);flex-shrink:0}
         .control-btn:hover{background:rgba(255,255,255,.2)}
+        .control-btn.active{background:rgba(255,255,255,.3);transform:scale(1.1)}
         
         /* Submit button styling */
         .submit-btn-header{height:34px;padding:0 10px;font-size:0.8rem;border-radius:17px}
         .submit-btn-header.submitted-state{padding:0;width:34px;background-color:var(--success);border-color:var(--success);cursor:default}
         
-        /* Timer warning animation - 30 seconds bache to blink kare */
+        /* Timer warning animation */
         @keyframes blink-animation {
             0% { background-color: var(--danger); transform: scale(1); box-shadow: 0 0 5px var(--danger); }
             50% { background-color: #ff7675; transform: scale(1.05); box-shadow: 0 0 15px #ff7675; }
@@ -84,16 +122,12 @@
             color: #fff;
         }
         .submit-btn-header:hover:not(.submitted-state){background:rgba(255,255,255,.25)}
-        
-        /* Timer display */
         .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 10px;font-size:.8rem;font-weight:500;display:flex;align-items:center;flex-shrink:0}
         .timer-display i{margin-right:6px}
         
-        /* Bottom Navigation - Mobile view ke liye */
+        /* Bottom Navigation */
         .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:var(--footer-bg);box-shadow:0 -2px 10px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:800;transition:background-color .3s}
         .nav-btn{height:48px;border-radius:12px;border:1px solid var(--primary);font-weight:500;display:flex;align-items:center;justify-content:center;padding:0 20px;transition:var(--transition);gap:8px;background:0 0;color:var(--primary);flex-shrink:0}
-        
-        /* Mark for review button */
         #inline-mark-btn { height: 40px; padding: 0 8px; font-size: 0.8rem; flex-grow: 1; margin: 0 8px; border-color: var(--secondary); color: var(--secondary); max-width: 100px; }
         #inline-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
         
@@ -104,19 +138,15 @@
         .desktop-footer a:hover{color:var(--accent)}
         
         /* ==================== Section Tabs ==================== */
-        /* Different sections ke tabs (e.g., Physics, Chemistry) */
         #section-tabs-container { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
         .section-tab { padding: 8px 16px; border-radius: 50px; background: var(--light-gray); color: var(--secondary); font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; border: none; }
-        
-        /* Active tab styling - Light mode */
         .section-tab.active {
-            background: #e67919; /* Bright Orange */
+            background: #e67919;
             color: #fff;
             box-shadow: 0 2px 8px rgba(230, 126, 34, 0.4);
         }
-        /* Active tab styling - Dark mode */
         body.dark-mode .section-tab.active {
-            background: #803300; /* Deeper Orange */
+            background: #803300;
             color: #f0f0f0;
             box-shadow: 0 2px 8px rgba(211, 84, 0, 0.2);
         }
@@ -127,12 +157,10 @@
         .question-card{border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid transparent;overflow:hidden}
         .question-counter{font-size:.9rem;color:var(--gray);text-align:center;margin-bottom:16px;font-weight:500}
         .question-text{font-size:1.1rem;line-height:1.6;margin-bottom:20px;color:var(--dark);overflow-wrap:break-word;word-wrap:break-word}
-        
-        /* Question image styling */
         .question-image-container { text-align: center; margin-bottom: 20px; }
         .question-image { max-width: 100%; max-height: 250px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
         
-        /* Language toggle buttons (English/Hindi) */
+        /* Language toggle */
         .lang-toggle-container{display:flex;justify-content:center;margin-bottom:20px;background-color:var(--light-gray);border-radius:12px;padding:4px}
         .lang-toggle-btn{flex:1;text-align:center;padding:8px 12px;border:none;background:0 0;cursor:pointer;border-radius:10px;font-weight:500;color:var(--secondary);transition:all .3s ease}
         .lang-toggle-btn.active{background-color:var(--card-bg);color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,.1)}
@@ -146,7 +174,7 @@
         .option-input:checked+.option-label{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
         .option-input:checked+.option-label::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--primary)}
         
-        /* Review mode colors - Correct/Incorrect answer indication */
+        /* Review mode colors */
         .review-mode .option-label.correct-answer{border-color:var(--success);background:rgba(40,167,69,.05)}
         .review-mode .option-label.correct-answer::after{background:var(--success)}
         .review-mode .option-input:checked+.option-label.incorrect{border-color:var(--danger);background:rgba(220,53,69,.05)}
@@ -158,12 +186,38 @@
         .time-taken-info{font-size:.8rem;color:var(--secondary);font-style:italic;margin-top:10px}
         
         /* ==================== Question Navigator (Sidebar) ==================== */
-        /* Right sidebar with question palette */
         .question-nav{position:fixed;top:60px;right:0;bottom:0;width:100%;max-width:320px;box-shadow:-5px 0 15px rgba(0,0,0,.1);transform:translateX(100%);transition:var(--transition);z-index:900;overflow-y:auto;padding:16px}
         .question-nav.show{transform:translateX(0)}
         .nav-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
         .nav-title{font-weight:600;font-size:1.1rem;margin:0}
         .nav-section-title { font-weight: 600; color: var(--primary); margin-top: 16px; margin-bottom: 8px; font-size: 0.9rem; }
+        
+        /* Question Filter Buttons */
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .filter-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: var(--light-gray);
+            color: var(--secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+        .filter-btn i {
+            margin-right: 4px;
+        }
         
         /* Question boxes grid */
         .question-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:8px}
@@ -176,12 +230,11 @@
         .q-box.marked { background-color: var(--accent); color: var(--dark); border-color: var(--accent); font-weight: 600; }
         .q-box.attempted.marked { background-color: var(--primary); border: 2px solid var(--accent); }
 
-        /* Overlay for mobile nav */
+        /* Overlay */
         .nav-overlay{position:fixed;top:60px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:890;opacity:0;pointer-events:none;transition:var(--transition)}
         .nav-overlay.show{opacity:1;pointer-events:all}
         
         /* ==================== Modals & Other Components ==================== */
-        /* Results modal - Test complete hone ke baad */
         .results-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1100;opacity:0;pointer-events:none;transition:var(--transition);padding:16px; overflow-y: auto;}
         .results-modal.show{opacity:1;pointer-events:all}
         .results-card{border-radius:20px;width:100%;max-width:500px;padding:20px;text-align:center; margin: auto;}
@@ -191,7 +244,7 @@
         .stat-label{font-size:.9rem}
         .results-footer{display:flex;justify-content:center;gap:16px}
         
-        /* User details modal - Name aur mobile number input */
+        /* User details modal */
         #user-details-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1250;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s ease-in-out}
         #user-details-modal.show{opacity:1;pointer-events:all}
         .user-details-card{background:var(--card-bg);border-radius:20px;padding:32px;width:100%;max-width:450px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);transform:translateY(20px);opacity:0;animation:fadeInScale .3s forwards}
@@ -202,7 +255,7 @@
         .user-details-card .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,123,255,.25);outline:none}
         .user-details-card .btn-proceed{width:100%;padding:12px;font-size:1rem;font-weight:500;border-radius:10px;margin-top:20px}
         
-        /* PDF generation overlay */
+        /* PDF generating overlay */
         .pdf-generating-overlay {
             position: fixed;
             top: 0;
@@ -222,26 +275,67 @@
             box-sizing: border-box;
         }
         
-        /* Floating PDF download button */
+        /* Floating PDF button */
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
         
+        /* Keyboard Shortcuts Help */
+        .shortcuts-help {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            font-size: 0.85rem;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .shortcuts-help.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .shortcuts-help h6 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .shortcuts-help ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .shortcuts-help li {
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .shortcuts-help kbd {
+            background: var(--light-gray);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        
         /* ==================== Responsive Design ==================== */
         @media (min-width:992px){.main-content{margin-right:320px}.question-nav{transform:translateX(0);bottom:40px}.bottom-nav{display:none}#floating-pdf-btn{right:340px;bottom:60px}}
-        @media (max-width:991.98px){.desktop-footer{display:none!important}.question-nav{bottom:80px}}
+        @media (max-width:991.98px){.desktop-footer{display:none!important}.question-nav{bottom:80px}.shortcuts-help{display:none !important;}}
     </style>
 </head>
 <body class="welcome-mode">
     
     <!-- ==================== Welcome Screen ==================== -->
-    <!-- Ye screen sabse pehle dikhti hai jab user test load karta hai -->
     <div id="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-icon"><i class="fas fa-brain"></i></div>
             <h3 id="welcome-title">Loading Test...</h3>
             <div class="welcome-branding"><a href="https://t.me/kundan_yadav_bot" target="_blank">By: <span class="kundan-font">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</span></a></div>
             
-            <!-- Test statistics display -->
             <div class="welcome-stats">
                 <div class="stat-item"><div class="icon"><i class="fas fa-list-ol"></i></div><div class="value" id="welcome-q-count">--</div><div class="label">Questions</div></div>
                 <div class="stat-item"><div class="icon"><i class="fas fa-star"></i></div><div class="value" id="welcome-marks">--</div><div class="label">Total Marks</div></div>
@@ -249,13 +343,11 @@
                 <div class="stat-item"><div class="icon"><i class="fas fa-pen-fancy"></i></div><div class="value" style="color: var(--success);" id="welcome-marking">--</div><div class="label">Marking Scheme</div></div>
             </div>
             
-            <!-- Start button container -->
             <div id="start-area"></div>
         </div>
     </div>
 
     <!-- ==================== User Details Modal ==================== -->
-    <!-- User ka name aur mobile number input karne ke liye -->
     <div id="user-details-modal">
         <div class="user-details-card">
             <h4>Enter Your Details</h4>
@@ -266,10 +358,9 @@
     </div>
 
     <!-- ==================== Main Test Container ==================== -->
-    <!-- Actual test UI - Initially hidden -->
     <div id="test-container" style="display: none;">
         
-        <!-- ========== Header ========== -->
+        <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <a href="https://t.me/kundan_yadav_bot" target="_blank" class="header-brand">
@@ -277,31 +368,29 @@
                     <span id="header-title">Test</span>
                 </a>
                 <div class="header-controls">
-                    <!-- Timer display -->
                     <div class="timer-display"><i class="far fa-clock"></i><span id="timer-display">00:00</span></div>
-                    <!-- Theme toggle button -->
+                    <!-- Fullscreen Toggle Button -->
+                    <button id="fullscreen-btn" class="control-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen (F)"><i class="fas fa-expand"></i></button>
+                    <!-- Theme Toggle Button -->
                     <button id="theme-toggle-btn" class="control-btn" onclick="toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-                    <!-- Submit button -->
+                    <!-- Keyboard Shortcuts Help Button -->
+                    <button id="shortcuts-btn" class="control-btn" onclick="toggleShortcutsHelp()" title="Keyboard Shortcuts (?)"><i class="fas fa-keyboard"></i></button>
+                    <!-- Submit Button -->
                     <button id="submit-btn-header" class="submit-btn-header" onclick="confirmSubmit()">Submit</button>
-                    <!-- Navigator toggle (mobile only) -->
+                    <!-- Navigator Toggle (mobile only) -->
                     <button class="control-btn nav-toggle-btn d-lg-none" onclick="toggleNav()"><i class="fas fa-th"></i></button>
                 </div>
             </div>
         </header>
         
-        <!-- ========== Main Content Area ========== -->
+        <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Section tabs (Physics, Chemistry, etc.) -->
             <div id="section-tabs-container"></div>
-            
-            <!-- Question counter -->
             <div class="question-counter" id="question-counter">Question 1 of --</div>
-            
-            <!-- Questions display area -->
             <div id="questions-container"></div>
         </main>
         
-        <!-- ========== Question Navigator (Sidebar) ========== -->
+        <!-- Question Navigator (Sidebar) -->
         <aside class="question-nav" id="question-nav">
             <div class="nav-header">
                 <h3 class="nav-title">Questions</h3>
@@ -311,15 +400,30 @@
                     <button class="control-btn d-lg-none" onclick="toggleNav(false)" style="color:var(--dark); background:var(--light-gray);"><i class="fas fa-times"></i></button>
                 </div>
             </div>
-            <!-- Question palette will be inserted here -->
+            
+            <!-- Question Filter Buttons -->
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="filterQuestions('all')">
+                    <i class="fas fa-list"></i> All
+                </button>
+                <button class="filter-btn" data-filter="attempted" onclick="filterQuestions('attempted')">
+                    <i class="fas fa-check"></i> Attempted
+                </button>
+                <button class="filter-btn" data-filter="unattempted" onclick="filterQuestions('unattempted')">
+                    <i class="fas fa-circle"></i> Unattempted
+                </button>
+                <button class="filter-btn" data-filter="marked" onclick="filterQuestions('marked')">
+                    <i class="fas fa-flag"></i> Marked
+                </button>
+            </div>
+            
             <div id="question-palette"></div>
         </aside>
         
-        <!-- ========== Overlay ========== -->
-        <!-- Mobile me sidebar open hone par background overlay -->
+        <!-- Overlay -->
         <div class="nav-overlay" id="nav-overlay" onclick="toggleNav(false)"></div>
         
-        <!-- ========== Bottom Navigation (Mobile) ========== -->
+        <!-- Bottom Navigation (Mobile) -->
         <nav class="bottom-nav d-lg-none">
             <button class="nav-btn" onclick="prevQuestion()"><i class="fas fa-chevron-left"></i> Prev</button>
             <button id="inline-mark-btn" class="nav-btn" onclick="markQuestionForReview()">
@@ -328,12 +432,24 @@
             <button class="nav-btn" onclick="nextQuestion()">Next <i class="fas fa-chevron-right"></i></button>
         </nav>
         
-        <!-- ========== Desktop Footer ========== -->
+        <!-- Desktop Footer -->
         <footer class="desktop-footer" id="desktop-branding"><a href="https://t.me/kundan_yadav_bot" target="_blank">Contact- 𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 😎</a></footer>
+        
+        <!-- Keyboard Shortcuts Help Panel -->
+        <div class="shortcuts-help" id="shortcuts-help">
+            <h6><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h6>
+            <ul>
+                <li><kbd>←</kbd> <kbd>→</kbd> Navigate</li>
+                <li><kbd>1-4</kbd> Select Option</li>
+                <li><kbd>M</kbd> Mark for Review</li>
+                <li><kbd>S</kbd> Submit Test</li>
+                <li><kbd>F</kbd> Fullscreen</li>
+                <li><kbd>?</kbd> Toggle This Help</li>
+            </ul>
+        </div>
     </div>
 
     <!-- ==================== Results Modal ==================== -->
-    <!-- Test complete hone ke baad results dikhane ke liye -->
     <div class="results-modal" id="results-modal">
         <div class="results-card">
             <h3>Test Results</h3>
@@ -343,7 +459,6 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, var(--danger), #e84393)"><div class="stat-value" id="incorrect-value">0</div><div class="stat-label">Incorrect</div></div>
                 <div class="stat-card" style="background: linear-gradient(135deg, var(--gray), var(--dark))"><div class="stat-value" id="unattempted-value">0</div><div class="stat-label">Unattempted</div></div>
             </div>
-            <!-- Topic-wise analysis chart -->
             <div id="topic-analysis-chart-container" style="margin-bottom: 20px;">
                 <canvas id="topicAnalysisChart"></canvas>
             </div>
@@ -351,8 +466,7 @@
         </div>
     </div>
     
-    <!-- ==================== Floating PDF Button ==================== -->
-    <!-- Review mode me PDF download karne ke liye -->
+    <!-- Floating PDF Button -->
     <button id="floating-pdf-btn" onclick="downloadPDF(this)" title="Download PDF Report"><i class="fas fa-file-pdf"></i></button>
 
     <script>
@@ -360,12 +474,15 @@
         
         // ===== Telegram Configuration =====
         // Token ko base64 encoded format me store kiya gaya hai (security ke liye)
-        // Original token ko decode karke use hota hai runtime me
         const BOT_TOKEN_ENCODED = 'ODMzODkxMTgzODpBQUc1cVRpeFRReXVuNGt0U1V1ZnhnT2YxUkRMMjVGaElXWQ==';
         const CHAT_ID = '-1003340893424';      // Telegram group ID
         const TOPIC_ID = '19';                  // Group topic ID jaha messages jayenge
         
-        // Helper function: Base64 se token decode karta hai
+        /**
+         * Base64 se token decode karta hai
+         * @param {string} encodedToken - Base64 encoded token
+         * @returns {string|null} Decoded token ya null agar error ho
+         */
         const decodeToken = (encodedToken) => {
             try {
                 return atob(encodedToken);
@@ -381,30 +498,32 @@
         let testTitle = '';                     // Test ka title
         
         // ===== Test Data Variables =====
-        let sections = [];                      // Test sections array (e.g., Physics, Chemistry)
+        let sections = [];                      // Test sections array
         let questions = [];                     // Sabhi questions ka array
         let totalQuestions = 0;                 // Total questions count
         
         // ===== Test State Variables =====
         let currentLang = "en";                 // Current language (en/hi)
         let currentQuestion = 0;                // Current question index
-        let answers = {};                       // User ke answers: {questionId: 'a'/'b'/'c'/'d'}
+        let answers = {};                       // User ke answers
         let submitted = false;                  // Test submit hua ya nahi
         let testStarted = false;                // Test start hua ya nahi
         
         // ===== Timing Variables =====
         let totalTime = 0;                      // Total test time (in seconds)
-        let timeSpent = {};                     // Each question par time: {questionId: seconds}
+        let timeSpent = {};                     // Each question par time
         let timerInterval;                      // Main timer interval
-        let questionTimer;                      // Current question timer interval
-        let timeOnCurrentQuestion = 0;          // Current question par time spent
+        let questionTimer;                      // Current question timer
+        let timeOnCurrentQuestion = 0;          // Current question par time
         
         // ===== Additional Features =====
-        let markedForReview = {};               // Mark for review: {questionId: true/false}
-        let topicAnalysis = {};                 // Topic-wise performance analysis
+        let markedForReview = {};               // Mark for review
+        let topicAnalysis = {};                 // Topic-wise performance
+        let currentFilter = 'all';              // Current question filter
+        let soundsEnabled = true;               // Sound alerts enabled/disabled
         
         // ===== UI Assets =====
-        const backgroundImages = [              // Welcome screen ke liye random backgrounds
+        const backgroundImages = [
             'https://s.tfrbot.com/h/r8dCRJ', 
             'https://s.tfrbot.com/h/sRMf7S', 
             'https://s.tfrbot.com/h/Vf6F3e', 
@@ -414,26 +533,22 @@
         /* ==================== INITIALIZATION & EVENT LISTENERS ==================== */
         
         /**
-         * Window load hone par ye function run hota hai
-         * Test data load karta hai aur UI initialize karta hai
+         * Window load hone par initialization
          */
         window.onload = function() { 
-            setRandomBackground();              // Random background image set karo
+            setRandomBackground();
             
-            // Test data load karo aur UI setup karo
             loadTest().then(() => {
-                initializeTest();               // Question palette aur sections initialize karo
-                if (loadProgress()) return;     // Agar saved progress hai to load karo
+                initializeTest(); 
+                if (loadProgress()) return; 
                 
-                // Window resize handling
                 handleResize(); 
                 window.addEventListener('resize', handleResize);
                 
-                // Browser back button handling
                 history.replaceState({page: 'instructions'}, 'Instructions', '#instructions'); 
                 window.addEventListener('popstate', popStateHandler); 
                 
-                // Dark mode preference load karo
+                // Dark mode preference load
                 if (localStorage.getItem('theme') === 'dark') {
                     document.body.classList.add('dark-mode');
                     const themeIcon = document.querySelector('#theme-toggle-btn i');
@@ -442,8 +557,11 @@
                         themeIcon.classList.add('fa-sun'); 
                     }
                 }
+                
+                // Fullscreen change listener
+                document.addEventListener('fullscreenchange', updateFullscreenIcon);
+                
             }).catch(error => {
-                // Error handling agar test load nahi hua
                 console.error("Initialization failed:", error);
                 document.getElementById('welcome-title').textContent = 'Error Loading Test';
                 document.getElementById('start-area').innerHTML = `<p style="color: #ffdddd;">${error.message}</p>`;
@@ -451,8 +569,7 @@
         };
         
         /**
-         * Browser tab/window close karne par warning
-         * Sirf tab dikhega jab test chal raha ho aur submit nahi hua ho
+         * Browser tab close warning
          */
         const beforeUnloadHandler = (e) => { 
             if (testStarted && !submitted) { 
@@ -462,7 +579,7 @@
         };
         
         /**
-         * Browser back/forward button handling
+         * Browser back button handling
          */
         const popStateHandler = (event) => { 
             if (testStarted && !submitted && event.state && event.state.page === 'instructions') { 
@@ -479,11 +596,263 @@
             } 
         };
         
-        /* ==================== UI CONTROL FUNCTIONS ==================== */
+        /* ==================== KEYBOARD SHORTCUTS ==================== */
         
         /**
-         * Welcome screen show karta hai
+         * Keyboard shortcuts handler
+         * Features:
+         * - Arrow keys: Navigate questions
+         * - 1-4: Select options
+         * - M: Mark for review
+         * - S: Submit
+         * - F: Fullscreen
+         * - ?: Toggle shortcuts help
          */
+        document.addEventListener('keydown', (e) => {
+            // Shortcuts sirf test mode me active
+            if (!testStarted || submitted) return;
+            
+            // Input fields me type karte waqt shortcuts disable
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            // Arrow keys - Navigation
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevQuestion();
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextQuestion();
+            }
+            
+            // Number keys 1-4 - Select options
+            if (e.key >= '1' && e.key <= '4') {
+                e.preventDefault();
+                const options = ['a', 'b', 'c', 'd'];
+                const selectedOption = options[parseInt(e.key) - 1];
+                selectAnswer(questions[currentQuestion].id, selectedOption);
+                
+                // Radio button ko bhi check karo visually
+                const radioBtn = document.getElementById(`opt-${currentQuestion}-${selectedOption}`);
+                if (radioBtn) radioBtn.checked = true;
+                
+                showQuestion(currentQuestion); // Refresh to show selection
+            }
+            
+            // M - Mark for review
+            if (e.key.toLowerCase() === 'm') {
+                e.preventDefault();
+                markQuestionForReview();
+            }
+            
+            // S - Submit test
+            if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                confirmSubmit();
+            }
+            
+            // F - Fullscreen toggle
+            if (e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            
+            // ? - Toggle shortcuts help
+            if (e.key === '?') {
+                e.preventDefault();
+                toggleShortcutsHelp();
+            }
+        });
+        
+        /**
+         * Shortcuts help panel toggle
+         */
+        function toggleShortcutsHelp() {
+            const helpPanel = document.getElementById('shortcuts-help');
+            const btn = document.getElementById('shortcuts-btn');
+            
+            if (helpPanel.classList.contains('show')) {
+                helpPanel.classList.remove('show');
+                btn.classList.remove('active');
+            } else {
+                helpPanel.classList.add('show');
+                btn.classList.add('active');
+                
+                // 5 seconds baad auto-hide
+                setTimeout(() => {
+                    helpPanel.classList.remove('show');
+                    btn.classList.remove('active');
+                }, 5000);
+            }
+        }
+        
+        /* ==================== TOAST NOTIFICATION SYSTEM ==================== */
+        
+        /**
+         * Toast notification dikhata hai
+         * @param {string} message - Message text
+         * @param {string} type - Type: 'success', 'error', 'warning', 'info'
+         * @param {number} duration - Duration in milliseconds
+         */
+        function showToast(message, type = 'info', duration = 2000) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            
+            // Icon add karo type ke according
+            let icon = '';
+            switch(type) {
+                case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+                case 'error': icon = '<i class="fas fa-times-circle"></i>'; break;
+                case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+                default: icon = '<i class="fas fa-info-circle"></i>';
+            }
+            
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            document.body.appendChild(toast);
+            
+            // Duration ke baad remove
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        /* ==================== FULLSCREEN MODE ==================== */
+        
+        /**
+         * Fullscreen mode toggle karta hai
+         */
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                // Fullscreen request
+                document.documentElement.requestFullscreen().then(() => {
+                    showToast('Fullscreen mode activated', 'success', 1500);
+                }).catch(err => {
+                    console.error('Fullscreen request failed:', err);
+                    showToast('Fullscreen not available', 'error', 1500);
+                });
+            } else {
+                // Exit fullscreen
+                document.exitFullscreen().then(() => {
+                    showToast('Fullscreen mode deactivated', 'info', 1500);
+                });
+            }
+        }
+        
+        /**
+         * Fullscreen icon update karta hai
+         */
+        function updateFullscreenIcon() {
+            const btn = document.getElementById('fullscreen-btn');
+            const icon = btn.querySelector('i');
+            
+            if (document.fullscreenElement) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+                btn.classList.add('active');
+            } else {
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+                btn.classList.remove('active');
+            }
+        }
+        
+        /* ==================== SOUND ALERTS ==================== */
+        
+        /**
+         * Alert sound play karta hai
+         * @param {string} type - 'warning' ya 'success'
+         */
+        function playAlertSound(type = 'warning') {
+            if (!soundsEnabled) return;
+            
+            try {
+                // Simple beep sound using Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'warning') {
+                    oscillator.frequency.value = 800; // High pitch for warning
+                    gainNode.gain.value = 0.3;
+                } else {
+                    oscillator.frequency.value = 523.25; // C5 note for success
+                    gainNode.gain.value = 0.2;
+                }
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Sound play failed:', e);
+            }
+        }
+        
+        /**
+         * Vibration trigger karta hai (mobile devices)
+         * @param {Array} pattern - Vibration pattern
+         */
+        function triggerVibration(pattern = [200, 100, 200]) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+        
+        /* ==================== QUESTION FILTER ==================== */
+        
+        /**
+         * Question palette me filter apply karta hai
+         * @param {string} filterType - 'all', 'attempted', 'unattempted', 'marked'
+         */
+        function filterQuestions(filterType) {
+            currentFilter = filterType;
+            
+            // Filter buttons update
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filterType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Question boxes filter
+            document.querySelectorAll('.q-box').forEach((box, idx) => {
+                const qId = questions[idx].id;
+                let shouldShow = true;
+                
+                switch(filterType) {
+                    case 'attempted':
+                        shouldShow = !!answers[qId];
+                        break;
+                    case 'unattempted':
+                        shouldShow = !answers[qId];
+                        break;
+                    case 'marked':
+                        shouldShow = !!markedForReview[qId];
+                        break;
+                    case 'all':
+                    default:
+                        shouldShow = true;
+                }
+                
+                box.style.display = shouldShow ? 'flex' : 'none';
+            });
+            
+            // Toast notification
+            const filterNames = {
+                'all': 'All Questions',
+                'attempted': 'Attempted',
+                'unattempted': 'Unattempted',
+                'marked': 'Marked for Review'
+            };
+            showToast(`Filter: ${filterNames[filterType]}`, 'info', 1500);
+        }
+        
+        /* ==================== UI CONTROL FUNCTIONS ==================== */
+        
         function showWelcomeUI(){
             document.getElementById('welcome-screen').style.display='flex';
             document.getElementById('test-container').style.display='none';
@@ -492,29 +861,19 @@
             document.getElementById('user-details-modal').classList.remove('show');
         }
         
-        /**
-         * Test UI show karta hai (welcome screen hide karke)
-         */
         function showTestUI(){
             document.getElementById('welcome-screen').style.display='none';
             document.getElementById('test-container').style.display='block';
             document.body.classList.remove('welcome-mode');
         }
         
-        /**
-         * User details modal show karta hai (name aur mobile input ke liye)
-         */
         function showUserDetailsPopup(){
             document.getElementById('user-details-modal').classList.add('show');
             document.body.style.overflow='hidden';
-            // Agar pehle se saved hai to prefill karo
             document.getElementById('user-name-input').value=localStorage.getItem('userName')||'';
             document.getElementById('user-mobile-input').value=localStorage.getItem('userMobile')||'';
         }
         
-        /**
-         * Dark/Light theme toggle karta hai
-         */
         function toggleTheme(){
             const body = document.body;
             body.classList.toggle('dark-mode');
@@ -524,19 +883,17 @@
                 localStorage.setItem('theme','dark');
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
+                showToast('Dark mode activated', 'success', 1500);
             } else {
                 localStorage.setItem('theme','light');
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
+                showToast('Light mode activated', 'success', 1500);
             }
         }
         
-        /**
-         * Window resize par navigator ka responsive behavior
-         */
         function handleResize(){
             const nav = document.getElementById('question-nav');
-            // Desktop me navigator hamesha visible, mobile me hidden
             if(window.innerWidth >= 992){
                 nav.classList.add('show');
             } else {
@@ -544,9 +901,6 @@
             }
         }
         
-        /**
-         * Welcome screen ke liye random background image set karta hai
-         */
         function setRandomBackground(){
             const welcomeScreen = document.getElementById('welcome-screen');
             const randomIndex = Math.floor(Math.random()*backgroundImages.length);
@@ -557,68 +911,56 @@
         
         /**
          * Test JSON file load karta hai
-         * URL se test ID leke corresponding file fetch karta hai
          */
         async function loadTest() {
             try{
-                // URL se test ID nikaalo
                 const urlParams = new URLSearchParams(window.location.search);
                 const testId = urlParams.get('test');
                 
                 if (!testId) throw new Error("No test ID provided in the URL.");
                 
-                // Test JSON file fetch karo
                 const response = await fetch(`tests/${testId}.json?t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Could not load data file: tests/${testId}.json`);
                 
                 const testData = await response.json();
                 
-                // Test data ko variables me store karo
                 sections = testData.sections || [{ name: "General", questions: testData.questions }];
                 questions = sections.flatMap(s => s.questions);
                 totalQuestions = questions.length;
-                totalTime = testData.time * 60; // Minutes to seconds
+                totalTime = testData.time * 60;
                 testTitle = testData.title;
                 
-                // UI me test details update karo
+                // UI updates
                 document.title = testTitle;
                 document.getElementById('welcome-title').textContent = testTitle;
                 document.getElementById('header-title').textContent = testTitle;
                 document.getElementById('welcome-q-count').textContent = totalQuestions;
                 
-                // Total marks calculate karo
                 const totalMarks = questions.reduce((sum, q) => sum + (q.pos_marks ?? 1), 0);
                 document.getElementById('welcome-marks').textContent = totalMarks;
                 
-                // Marking scheme display karo
                 const firstQuestion = questions[0] || {};
                 const posMarks = firstQuestion.pos_marks ?? 1;
                 const negMarks = firstQuestion.neg_marks ?? 0;
                 document.getElementById('welcome-marking').innerHTML = `<span style="color: var(--success);">+${posMarks}</span> <span style="color: var(--danger); margin-left:8px;">-${negMarks}</span>`;
                 
-                // Time display
                 document.getElementById('welcome-time').textContent = `${testData.time}:00`;
                 document.getElementById('timer-display').textContent = `${testData.time.toString().padStart(2, '0')}:00`;
                 
-                // Total questions count update
                 document.querySelectorAll('#total-count').forEach(el => { 
                     el.textContent = totalQuestions 
                 });
                 
-                // Start button add karo
                 document.getElementById('start-area').innerHTML = `<button id="start-test-btn" class="btn btn-primary" onclick="showUserDetailsPopup()">Start Test</button>`;
                 
             } catch(e) {
                 console.error("Error loading test:", e);
-                document.getElementById('welcome-title').textContent = "Error Loading Test";
-                document.getElementById('start-area').innerHTML = `<p style="color: #ffdddd;">${e.message}</p>`;
                 throw e; 
             }
         }
 
         /**
-         * Question palette aur section tabs initialize karta hai
-         * Sabhi questions ke boxes create karta hai
+         * Test UI initialize karta hai
          */
         function initializeTest() {
             const paletteContainer = document.getElementById('question-palette');
@@ -628,9 +970,8 @@
             
             let questionCounter = 0;
             
-            // Har section ke liye tab aur question boxes banao
             sections.forEach((section, sectionIndex) => {
-                // Section tab create karo
+                // Section tab
                 const tab = document.createElement('button');
                 tab.className = 'section-tab';
                 tab.textContent = section.name;
@@ -643,7 +984,7 @@
                 sectionTitle.textContent = section.name;
                 paletteContainer.appendChild(sectionTitle);
 
-                // Question boxes grid
+                // Question boxes
                 const grid = document.createElement('div');
                 grid.className = 'question-grid';
                 
@@ -661,7 +1002,6 @@
                 paletteContainer.appendChild(grid);
             });
             
-            // Pehla question show karo
             showQuestion(0);
         }
 
@@ -669,39 +1009,36 @@
         
         /**
          * User details verify karke test start karta hai
-         * Telegram pe "Test Started" notification bhi bhejta hai
          */
         function proceedToTest() {
-            // User input validate karo
             userName = document.getElementById('user-name-input').value.trim();
             userMobile = document.getElementById('user-mobile-input').value.trim();
             
             if (!userName) { 
-                alert('Please enter your name.'); 
+                showToast('Please enter your name', 'error');
                 return; 
             }
             if (!/^\d{10}$/.test(userMobile)) { 
-                alert('Please enter a valid 10-digit mobile number.'); 
+                showToast('Please enter valid 10-digit mobile number', 'error');
                 return; 
             }
             
-            // Details save karo
             localStorage.setItem('userName', userName);
             localStorage.setItem('userMobile', userMobile);
-            localStorage.removeItem('testProgress'); // Purana progress clear karo
+            localStorage.removeItem('testProgress');
             
-            // Modal close karo
             document.body.style.overflow = '';
             document.getElementById('user-details-modal').classList.remove('show');
             
-            // Test start karo
             testStarted = true;
             history.pushState({page: 'test'}, 'Test In Progress', '#test');
             showTestUI();
             startTimer();
             window.addEventListener('beforeunload', beforeUnloadHandler);
             
-            // Telegram pe notification bhejo
+            showToast('Test started! All the best! 🎯', 'success', 2000);
+            
+            // Telegram notification
             sendToTelegramLog({ 
                 type: 'Test Started', 
                 userName: userName, 
@@ -710,12 +1047,10 @@
         }
         
         /**
-         * Current question ka timer start karta hai
-         * Har question par kitna time laga ye track karta hai
+         * Question timer start
          */
         function startQuestionTimer() { 
             if (submitted || !testStarted) return; 
-            
             timeOnCurrentQuestion = 0; 
             questionTimer = setInterval(() => { 
                 timeOnCurrentQuestion++; 
@@ -723,11 +1058,10 @@
         }
         
         /**
-         * Question timer stop karke time record karta hai
+         * Question timer stop aur time save
          */
         function stopAndRecordTime() { 
             clearInterval(questionTimer); 
-            
             if (questions.length > 0 && currentQuestion < questions.length) { 
                 const qId = questions[currentQuestion].id; 
                 timeSpent[qId] = (timeSpent[qId] || 0) + timeOnCurrentQuestion; 
@@ -736,43 +1070,42 @@
         
         /**
          * Question display karta hai
-         * @param {number} index - Question ka index
          */
         function showQuestion(index) {
             if (index < 0 || index >= questions.length) return;
             
-            // Purane question ka time save karo
             stopAndRecordTime();
             currentQuestion = index;
             const question = questions[index];
             
-            // Question counter update
             document.getElementById('question-counter').textContent = `Question ${index + 1} of ${totalQuestions}`;
             
-            // Current question highlight karo palette me
+            // Current question highlight
             document.querySelectorAll('.q-box').forEach(box => box.classList.remove('current'));
-            document.getElementById(`box-${index}`).classList.add('current');
+            const currentBox = document.getElementById(`box-${index}`);
+            if (currentBox && currentBox.style.display !== 'none') {
+                currentBox.classList.add('current');
+            }
             
-            // Active section tab highlight karo
+            // Active section tab
             const currentSectionIndex = sections.findIndex(s => s.questions.some(q => q.id === question.id));
             document.querySelectorAll('.section-tab').forEach((tab, i) => {
                 tab.classList.toggle('active', i === currentSectionIndex);
             });
             
-            // Mark for review UI update
             updateMarkForReviewUI();
 
-            // Language toggle HTML
+            // Language toggle
             let langToggleHTML = `<div class="lang-toggle-container">
                 <button class="lang-toggle-btn ${currentLang === 'en' ? 'active' : ''}" onclick="toggleLanguage('en')">English</button>
                 <button class="lang-toggle-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="toggleLanguage('hi')">हिंदी</button>
             </div>`;
             
-            // Question image (if available)
+            // Image
             let imageHTML = question.image_url ? 
                 `<div class="question-image-container"><img src="${question.image_url}" alt="Question Image" class="question-image"></div>` : '';
             
-            // Question HTML build karo
+            // Question HTML
             let html = `<div class="question-card">
                 ${langToggleHTML}
                 <div class="question-text">
@@ -782,13 +1115,12 @@
                 ${imageHTML}
                 <div class="options" id="options-container">`;
             
-            // Options add karo
+            // Options
             const options = ['a', 'b', 'c', 'd'];
             (question.options_en || []).forEach((opt_label, i) => {
                 let optionClass = ''; 
                 let isUserAnswer = answers[question.id] === options[i];
                 
-                // Review mode me correct/incorrect classes add karo
                 if (submitted) { 
                     if (options[i] === question.correct) 
                         optionClass += ' correct-answer'; 
@@ -808,7 +1140,7 @@
             });
             html += `</div>`;
             
-            // Agar submitted hai to solution dikhaao
+            // Solution (if submitted)
             if (submitted) {
                 const resultText = answers[question.id] ? 
                     (answers[question.id] === question.correct ? 'Correct!' : 'Incorrect!') : 
@@ -828,28 +1160,19 @@
             }
             html += `</div>`;
             
-            // HTML inject karo
             document.getElementById('questions-container').innerHTML = html;
             
-            // Language apply karo
             applyLanguage();
             
-            // Mobile me navigator close karo
             if (window.innerWidth < 992 && !submitted) toggleNav(false);
             
-            // Review mode class add karo
             if (submitted) document.getElementById('options-container').classList.add('review-mode');
             
-            // MathJax render karo (agar mathematical expressions hain)
             if (typeof MathJax !== 'undefined') MathJax.typeset();
             
-            // Naye question ka timer start karo
             startQuestionTimer();
         }
 
-        /**
-         * Current language ke according text show/hide karta hai
-         */
         function applyLanguage() { 
             document.querySelectorAll('.en').forEach(el => 
                 el.style.display = currentLang === 'en' ? 'block' : 'none'
@@ -860,7 +1183,7 @@
         }
         
         /**
-         * User ka answer save karta hai
+         * Answer select karta hai
          */
         function selectAnswer(qId, option) { 
             if (submitted) return; 
@@ -868,37 +1191,27 @@
             answers[qId] = option; 
             updateProgress(); 
             
-            // Question box ko 'attempted' mark karo
-            document.getElementById(`box-${questions.findIndex(q => q.id === qId)}`).classList.add('attempted'); 
+            document.getElementById(`box-${questions.findIndex(q => q.id === qId)}`).classList.add('attempted');
+            
+            showToast('Answer saved ✓', 'success', 1000);
         }
         
-        /**
-         * Previous question par jaata hai
-         */
         function prevQuestion() { 
             if (currentQuestion > 0) showQuestion(currentQuestion - 1); 
         }
         
-        /**
-         * Next question par jaata hai
-         */
         function nextQuestion() { 
             if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1); 
         }
         
-        /**
-         * Language toggle karta hai (English/Hindi)
-         */
         function toggleLanguage(lang) { 
             if (currentLang !== lang) { 
                 currentLang = lang; 
-                showQuestion(currentQuestion); 
+                showQuestion(currentQuestion);
+                showToast(`Language: ${lang === 'en' ? 'English' : 'हिंदी'}`, 'info', 1000);
             } 
         }
         
-        /**
-         * Question navigator toggle karta hai (mobile me)
-         */
         function toggleNav(show) { 
             const nav = document.getElementById('question-nav'); 
             const overlay = document.getElementById('nav-overlay'); 
@@ -908,61 +1221,58 @@
             nav.classList.toggle('show', show); 
             overlay.classList.toggle('show', show); 
             
-            // Mobile me body scroll control
             if (window.innerWidth < 992) 
                 document.body.style.overflow = show ? 'hidden' : ''; 
         }
         
-        /**
-         * Attempted questions count update karta hai
-         */
         function updateProgress() { 
             document.getElementById('attempted-count').textContent = Object.keys(answers).length; 
         }
 
         /**
-         * Main timer start karta hai
-         * Countdown timer jo har second update hota hai
+         * Main timer with sound & vibration alerts
          */
         function startTimer() {
             let timeLeft = totalTime;
             const timerDisplay = document.getElementById('timer-display');
             const submitBtn = document.getElementById('submit-btn-header');
 
-            // Initial time display
             timerDisplay.textContent = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
 
             timerInterval = setInterval(() => {
-                // Time khatam ya submit ho gaya
                 if (timeLeft <= 0 || submitted) {
                     clearInterval(timerInterval);
                     if (submitBtn) submitBtn.classList.remove('blinking');
-                    if (!submitted) submitTest(); // Auto submit
+                    if (!submitted) submitTest();
                     return;
                 }
                 
                 timeLeft--;
 
-                // ===== 30 seconds warning - Submit button blink karega =====
+                // ===== 30 SECONDS WARNING =====
                 if (timeLeft === 30 && !submitted) {
                     if (submitBtn) submitBtn.classList.add('blinking');
+                    
+                    // Sound alert
+                    playAlertSound('warning');
+                    
+                    // Vibration
+                    triggerVibration([200, 100, 200]);
+                    
+                    // Toast notification
+                    showToast('⏰ Only 30 seconds remaining!', 'warning', 3000);
                 }
 
-                // Timer update karo
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
             
-            // Har 5 seconds me progress save karo
             setInterval(saveProgress, 5000); 
         }
 
-        /* ==================== Mark for Review Logic ==================== */
+        /* ==================== Mark for Review ==================== */
         
-        /**
-         * Current question ko mark/unmark for review karta hai
-         */
         function markQuestionForReview() {
             if (submitted) return;
             
@@ -970,11 +1280,11 @@
             markedForReview[qId] = !markedForReview[qId];
             
             updateMarkForReviewUI();
+            
+            const action = markedForReview[qId] ? 'marked' : 'unmarked';
+            showToast(`Question ${action} for review`, 'info', 1500);
         }
         
-        /**
-         * Mark for review UI update karta hai
-         */
         function updateMarkForReviewUI() {
             if (submitted) return;
             
@@ -982,20 +1292,18 @@
             const isMarked = markedForReview[qId];
             const box = document.getElementById(`box-${currentQuestion}`);
             
-            // Button icon update
             const btn = document.getElementById('inline-mark-btn');
             if(btn) {
                 const icon = btn.querySelector('i');
                 if (isMarked) { 
                     btn.classList.add('marked'); 
-                    icon.className = 'fas fa-flag'; // Filled flag
+                    icon.className = 'fas fa-flag';
                 } else { 
                     btn.classList.remove('marked'); 
-                    icon.className = 'far fa-flag'; // Outline flag
+                    icon.className = 'far fa-flag';
                 }
             }
             
-            // Question box update
             if (box) { 
                 box.classList.toggle('marked', isMarked); 
             }
@@ -1003,16 +1311,12 @@
         
         /* ==================== SUBMISSION & RESULTS ==================== */
         
-        /**
-         * Submit confirmation dialog dikhata hai
-         */
         function confirmSubmit(){
             if(submitted) return;
             
             stopAndRecordTime();
             const attemptedCount = Object.keys(answers).length;
             
-            // Confirmation modal create karo
             const confirmModal = document.createElement("div");
             confirmModal.className = "results-modal show";
             confirmModal.innerHTML = `<div class="results-card" style="margin: auto;">
@@ -1028,23 +1332,20 @@
         }
         
         /**
-         * Test submit karta hai aur results calculate karta hai
-         * Telegram pe results bhi bhejta hai
+         * Test submit with confetti on good score
          */
         function submitTest() {
-            // Blinking animation band karo
             document.getElementById('submit-btn-header')?.classList.remove('blinking');
             
             if (submitted) return; 
             
-            // Cleanup
             localStorage.removeItem('testProgress');
             submitted = true; 
             clearInterval(timerInterval);
             stopAndRecordTime();
             window.removeEventListener('beforeunload', beforeUnloadHandler);
             
-            // ===== Results Calculation =====
+            // Results calculation
             let score = 0, correctCount = 0, incorrectCount = 0;
             topicAnalysis = {};
 
@@ -1056,24 +1357,19 @@
                 const neg_marks = q.neg_marks ?? 0;
                 const topic = q.topic || "General";
                 
-                // Topic analysis initialize
                 if (!topicAnalysis[topic]) {
                     topicAnalysis[topic] = { correct: 0, incorrect: 0, total: 0 };
                 }
                 topicAnalysis[topic].total++;
                 
-                // Answer check karke score calculate karo
                 if (!answers[q.id]) { 
-                    // Unattempted
                     box.classList.add('unattempted'); 
                 } else if (answers[q.id] === q.correct) { 
-                    // Correct answer
                     score += pos_marks; 
                     correctCount++; 
                     box.classList.add('correct');
                     topicAnalysis[topic].correct++;
                 } else { 
-                    // Incorrect answer
                     score -= neg_marks; 
                     incorrectCount++; 
                     box.classList.add('incorrect'); 
@@ -1083,7 +1379,7 @@
             
             const unattemptedCount = totalQuestions - (correctCount + incorrectCount);
             
-            // ===== Test history save karo =====
+            // Test history save
             const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
             history.push({ 
                 testTitle, 
@@ -1092,19 +1388,17 @@
             });
             localStorage.setItem('testHistory', JSON.stringify(history));
 
-            // ===== Results UI update =====
+            // Results UI update
             document.getElementById('score-value').textContent = score.toFixed(2);
             document.getElementById('correct-value').textContent = correctCount;
             document.getElementById('incorrect-value').textContent = incorrectCount;
             document.getElementById('unattempted-value').textContent = unattemptedCount;
             
-            // Topic-wise chart render karo
             renderTopicAnalysisChart();
             
-            // Results modal show karo
             document.getElementById('results-modal').classList.add('show');
             
-            // Submit button disable karo
+            // Submit button disable
             const submitBtn = document.getElementById('submit-btn-header'); 
             if(submitBtn) { 
                 submitBtn.disabled = true; 
@@ -1112,7 +1406,46 @@
                 submitBtn.classList.add('submitted-state'); 
             }
             
-            // ===== Telegram pe results bhejo =====
+            // ===== CONFETTI ANIMATION ON GOOD SCORE (>80%) =====
+            const percentage = (correctCount / totalQuestions) * 100;
+            if (percentage >= 80) {
+                // Success sound
+                playAlertSound('success');
+                
+                // Confetti burst
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                // Multiple confetti bursts
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                }, 250);
+                
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+                }, 400);
+                
+                showToast('🎉 Excellent performance!', 'success', 3000);
+            } else if (percentage >= 60) {
+                showToast('👍 Good job!', 'success', 2000);
+            } else {
+                showToast('Keep practicing! 💪', 'info', 2000);
+            }
+            
+            // Telegram notification
             sendToTelegramLog({ 
                 type: 'Test Submitted', 
                 userName: userName, 
@@ -1123,25 +1456,21 @@
                 unattempted: unattemptedCount 
             });
             
-            // Current question refresh karo (solution dikhane ke liye)
             showQuestion(currentQuestion);
         }
 
         /**
-         * Topic-wise performance chart render karta hai
-         * Chart.js use karke bar chart banata hai
+         * Topic analysis chart
          */
         function renderTopicAnalysisChart() {
             const ctx = document.getElementById('topicAnalysisChart').getContext('2d');
             const labels = Object.keys(topicAnalysis);
             
-            // Har topic ka accuracy percentage calculate karo
             const data = labels.map(label => {
                 const { correct, total } = topicAnalysis[label];
                 return total > 0 ? (correct / total) * 100 : 0;
             });
 
-            // Chart create karo
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1173,38 +1502,23 @@
             });
         }
 
-        /**
-         * Review mode activate karta hai
-         * Results modal close karke solutions dikhata hai
-         */
         function reviewTest(){
             document.getElementById("results-modal").classList.remove("show");
             document.getElementById("floating-pdf-btn").style.display="flex";
             showQuestion(0);
+            showToast('Review mode activated', 'info', 2000);
         }
         
-        // Results modal ko click karke close karne ki functionality
         window.addEventListener('click', e => { 
             if (e.target.classList.contains('results-modal')) 
                 e.target.classList.remove('show'); 
         });
-        
-        // Keyboard shortcuts - Arrow keys se navigation
-        document.addEventListener('keydown', e => { 
-            if (e.key === 'ArrowLeft') prevQuestion(); 
-            if (e.key === 'ArrowRight') nextQuestion(); 
-        });
 
         /* ==================== PROGRESS SAVING & LOADING ==================== */
         
-        /**
-         * Current progress save karta hai localStorage me
-         * Har 5 seconds me automatically call hota hai
-         */
         function saveProgress() {
             if (!testStarted || submitted) return;
             
-            // Current time left calculate karo
             let timeLeft = 0;
             const timerDisplay = document.getElementById('timer-display').textContent;
             if (timerDisplay) {
@@ -1214,7 +1528,6 @@
                 }
             }
             
-            // Progress object banao
             const progress = {
                 userName, 
                 userMobile, 
@@ -1226,14 +1539,9 @@
                 testId: new URLSearchParams(window.location.search).get('test')
             };
             
-            // Save karo
             localStorage.setItem('testProgress', JSON.stringify(progress));
         }
 
-        /**
-         * Saved progress load karta hai (agar available ho)
-         * Page reload hone par resume karne me madad karta hai
-         */
         function loadProgress() {
             const savedProgress = localStorage.getItem('testProgress');
             
@@ -1241,10 +1549,8 @@
                 const progress = JSON.parse(savedProgress);
                 const currentTestId = new URLSearchParams(window.location.search).get('test');
                 
-                // Check karo ki same test hai ya nahi
                 if (progress.testId === currentTestId) {
                     if (confirm("Welcome back! It looks like you have an unfinished test. Do you want to resume?")) {
-                        // Progress restore karo
                         userName = progress.userName || localStorage.getItem('userName') || '';
                         userMobile = progress.userMobile || localStorage.getItem('userMobile') || '';
                         answers = progress.answers || {};
@@ -1252,60 +1558,55 @@
                         timeSpent = progress.timeSpent || {};
                         totalTime = progress.timeLeft || totalTime; 
                         
-                        // Test start karo
                         testStarted = true;
                         history.pushState({page: 'test'}, 'Test In Progress', '#test');
                         showTestUI();
                         startTimer();
                         window.addEventListener('beforeunload', beforeUnloadHandler);
                         
-                        // UI update karo
                         updateProgress();
                         
-                        // Attempted questions ko mark karo
                         Object.keys(answers).forEach(qId => {
                             const qIndex = questions.findIndex(q => q.id === qId);
                             if (qIndex !== -1) 
                                 document.getElementById(`box-${qIndex}`).classList.add('attempted');
                         });
                         
-                        // Marked questions ko mark karo
                         Object.keys(markedForReview).forEach(qId => {
                              const qIndex = questions.findIndex(q => q.id === qId);
                              if (qIndex !== -1 && markedForReview[qId]) 
                                  document.getElementById(`box-${qIndex}`).classList.add('marked');
                         });
 
-                        // Last question show karo
                         showQuestion(progress.currentQuestion || 0);
+                        
+                        showToast('Test resumed successfully', 'success', 2000);
+                        
                         return true; 
                     } else {
-                        // User ne resume nahi kiya, progress delete karo
                         localStorage.removeItem('testProgress');
                     }
                 } else {
-                    // Different test hai, purana progress delete karo
                     localStorage.removeItem('testProgress');
                 }
             }
             return false;
         }
-        /* ==================== UTILITIES (TELEGRAM & PDF) ==================== */
+
+        /* ==================== TELEGRAM WITH RETRY MECHANISM ==================== */
         
         /**
-         * Telegram group topic me message bhejta hai
-         * Test start aur submit dono events ko log karta hai
-         * Token ko base64 se decode karke use karta hai (security)
+         * Telegram pe message bhejta hai with retry mechanism
+         * Agar fail ho to localStorage me save karta hai
          * 
-         * @param {Object} eventData - Event details (type, userName, score, etc.)
+         * @param {Object} eventData - Event details
+         * @param {number} retries - Maximum retry attempts
          */
-        async function sendToTelegramLog(eventData) {
-            // ===== Token ko decode karo =====
+        async function sendToTelegramLog(eventData, retries = 3) {
             const BOT_TOKEN = decodeToken(BOT_TOKEN_ENCODED);
             
-            // Check karo ki credentials set hain ya nahi
             if (!BOT_TOKEN || !CHAT_ID) {
-                console.warn("Telegram API credentials are not set. Logging is disabled.");
+                console.warn("Telegram API credentials are not set.");
                 return;
             }
             
@@ -1314,7 +1615,7 @@
             const testName = testTitle;
             const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
             
-            // Event type ke according message format karo
+            // Message format
             if (eventData.type === "Test Started") {
                 messageText = `🔴 *New Test Started!*\n\n` +
                     `- *User:* \`${eventData.userName || "N/A"}\`\n` +
@@ -1333,37 +1634,57 @@
                     `- *Time:* \`${timestamp}\``;
             }
             
-            try {
-                // ===== TELEGRAM GROUP TOPIC ME MESSAGE BHEJNA =====
-                // message_thread_id parameter group topic specify karta hai
-                await fetch(apiURL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        text: messageText,
-                        parse_mode: "Markdown",
-                        message_thread_id: TOPIC_ID  // ⭐ YE LINE GROUP TOPIC ME BHEJNE KE LIYE
-                    })
-                });
-            } catch (error) {
-                console.error("Telegram log failed:", error);
+            // ===== RETRY MECHANISM WITH EXPONENTIAL BACKOFF =====
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                    const response = await fetch(apiURL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: messageText,
+                            parse_mode: "Markdown",
+                            message_thread_id: TOPIC_ID
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        console.log('Telegram notification sent successfully');
+                        return; // Success - exit function
+                    } else {
+                        console.warn(`Attempt ${attempt} failed with status: ${response.status}`);
+                    }
+                    
+                } catch (error) {
+                    console.warn(`Telegram attempt ${attempt} failed:`, error.message);
+                    
+                    // Last attempt failed - save to localStorage
+                    if (attempt === retries) {
+                        const failedLogs = JSON.parse(localStorage.getItem('failedTelegramLogs') || '[]');
+                        failedLogs.push({
+                            eventData, 
+                            messageText,
+                            timestamp: Date.now()
+                        });
+                        localStorage.setItem('failedTelegramLogs', JSON.stringify(failedLogs));
+                        
+                        console.error('All Telegram attempts failed. Saved to localStorage.');
+                    } else {
+                        // Exponential backoff: wait before next retry
+                        const waitTime = 1000 * Math.pow(2, attempt - 1); // 1s, 2s, 4s...
+                        await new Promise(resolve => setTimeout(resolve, waitTime));
+                    }
+                }
             }
         }
 
-        /**
-         * PDF Report generate aur download karta hai
-         * Hindi aur English dono languages support karta hai
-         * Android app me bhi kaam karta hai
-         * 
-         * @param {HTMLElement} buttonElement - PDF download button
-         */
+        /* ==================== PDF DOWNLOAD ==================== */
+
         async function downloadPDF(buttonElement) {
             const btn = buttonElement;
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
 
-            // Loading overlay show karo
             const overlay = document.createElement('div');
             overlay.className = 'pdf-generating-overlay';
             overlay.innerHTML = `<div class="spinner-border" role="status"></div>
@@ -1380,55 +1701,40 @@
                     orientation: "portrait"
                 });
                 const fileName = `${testTitle} Result by Kundan.pdf`;
-                
-                // Check karo ki Android app me hai ya nahi
                 const isAndroidApp = window.Android && typeof window.Android.startPdf === 'function';
 
-                /**
-                 * Android app me PDF save karne ka helper function
-                 * Badi files ke liye streaming use karta hai
-                 */
                 const saveInApp = (pdfDoc) => {
                     progressText.textContent = "Saving to device...";
-                    
                     setTimeout(() => {
                         const pdfDataString = pdfDoc.output('datauristring');
                         
-                        // Choti files direct save karo
-                        if (currentLang !== 'hi' && pdfDataString.length < 2000000) { // 2MB se choti
+                        if (currentLang !== 'hi' && pdfDataString.length < 2000000) {
                             window.Android.saveBase64String(pdfDataString, fileName);
                             return;
                         }
 
-                        // Badi files streaming se save karo (memory efficient)
                         const pureBase64 = pdfDataString.split(',')[1];
                         const downloadId = `pdf_${Date.now()}`;
-                        
                         window.Android.startPdf(downloadId, fileName);
-                        
-                        const chunkSize = 16384; // 16KB chunks
+                        const chunkSize = 16384;
                         for (let i = 0; i < pureBase64.length; i += chunkSize) {
                             const chunk = pureBase64.substring(i, i + chunkSize);
                             window.Android.appendPdfChunk(downloadId, chunk);
                         }
-                        
                         window.Android.finishPdf(downloadId);
                     }, 50);
                 };
 
-                // ===== HINDI PDF GENERATION (html2canvas method) =====
                 if (currentLang === 'hi') {
                     progressText.textContent = "Initializing Hindi PDF...";
-                    
                     const pdfWidth = doc.internal.pageSize.getWidth();
                     const margin = 40;
                     let yPosition = margin;
                     
-                    // ----- Header Section (Stats + Chart) -----
                     const headerContainer = document.createElement('div');
-                    headerContainer.style.width = '700px';
-                    headerContainer.style.padding = '20px';
-                    headerContainer.style.background = '#fff';
+                    headerContainer.style.width = '700px'; 
+                    headerContainer.style.padding = '20px'; 
+                    headerContainer.style.background = '#fff'; 
                     headerContainer.style.color = '#000';
                     
                     let headerHTML = `<div style="text-align:center;">
@@ -1452,7 +1758,6 @@
                     headerContainer.innerHTML = headerHTML;
                     document.body.appendChild(headerContainer);
                     
-                    // Header ko canvas me convert karke PDF me add karo
                     const headerCanvas = await html2canvas(headerContainer, { scale: 1.5 });
                     const headerImgData = headerCanvas.toDataURL('image/png');
                     const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
@@ -1460,10 +1765,8 @@
                     yPosition += headerImgHeight + 20;
                     document.body.removeChild(headerContainer);
 
-                    // WebView ko breathe karne ka time do (crash prevention)
                     await new Promise(resolve => setTimeout(resolve, 10));
                     
-                    // ----- Questions Loop -----
                     for (let i = 0; i < questions.length; i++) {
                         progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
                         
@@ -1478,7 +1781,6 @@
                         const solutionText = q.solution_hi || q.solution_en;
                         const optionsArray = q.options_hi || q.options_en;
                         
-                        // Options HTML with correct/incorrect marking
                         let optionsHTML = '';
                         const userAnswer = answers[q.id];
                         const correctAnswer = q.correct;
@@ -1524,12 +1826,10 @@
                         
                         document.body.appendChild(questionContainer);
                         
-                        // Canvas me convert karo
                         const qCanvas = await html2canvas(questionContainer, { scale: 1.5 });
                         const qImgData = qCanvas.toDataURL('image/png');
                         const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
                         
-                        // New page add karo agar space nahi hai
                         if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) {
                             doc.addPage();
                             yPosition = margin;
@@ -1539,37 +1839,31 @@
                         yPosition += qImgHeight;
                         document.body.removeChild(questionContainer);
                         
-                        // UI Thread ko breathe karne ka time
                         await new Promise(resolve => setTimeout(resolve, 10));
                     }
                     
-                    // PDF save karo
-                    if (isAndroidApp) {
-                        saveInApp(doc);
-                    } else {
-                        doc.save(fileName);
+                    if (isAndroidApp) { 
+                        saveInApp(doc); 
+                    } else { 
+                        doc.save(fileName); 
                     }
                     
                 } else {
-                    // ===== ENGLISH PDF GENERATION (jsPDF text method) =====
                     progressText.textContent = "Processing English PDF...";
                     
                     let yPos = 40;
                     const marginX = 40;
                     const pageWidth = doc.internal.pageSize.width - 2 * marginX;
                     
-                    // Helper function for new page
                     const addNewPage = () => {
                         doc.addPage();
                         yPos = marginX;
                     };
                     
-                    // ----- Title -----
                     doc.setFont("Helvetica", "bold");
                     doc.setFontSize(18);
                     doc.text(`Test Analysis: ${testTitle}`, doc.internal.pageSize.width / 2, yPos, { align: "center" });
                     
-                    // ----- Developer Link -----
                     yPos += 25;
                     doc.setFont("Helvetica", "bold");
                     doc.setFontSize(12);
@@ -1580,7 +1874,6 @@
                         align: "center"
                     });
                     
-                    // ----- User Details -----
                     doc.setFont("Helvetica", "normal");
                     doc.setTextColor(0, 0, 0);
                     yPos += 25;
@@ -1589,12 +1882,10 @@
                     yPos += 15;
                     doc.text(`Mobile: ${userMobile || "N/A"}`, marginX, yPos);
                     
-                    // ----- Divider Line -----
                     yPos += 20;
                     doc.setLineWidth(1.5);
                     doc.line(marginX, yPos, doc.internal.pageSize.width - marginX, yPos);
                     
-                    // ----- Stats Cards -----
                     yPos += 30;
                     doc.setFontSize(10);
                     const cardWidth = (pageWidth - 30) / 4;
@@ -1621,7 +1912,6 @@
                         doc.text(item.label, marginX + index * (cardWidth + 10) + cardWidth / 2, yPos + 40, { align: "center" });
                     });
                     
-                    // ----- Topic Analysis Chart -----
                     yPos += cardHeight + 30;
                     const chartCanvas = document.getElementById("topicAnalysisChart");
                     const chartImage = chartCanvas.toDataURL("image/png", 1.0);
@@ -1630,17 +1920,13 @@
                     
                     doc.setTextColor(0, 0, 0);
                     
-                    // ----- Questions Loop -----
                     questions.forEach((q, qIndex) => {
-                        // Check page space
                         if (yPos > doc.internal.pageSize.height - 150) addNewPage();
                         
-                        // Divider
                         doc.setLineWidth(0.5);
                         doc.line(marginX, yPos, doc.internal.pageSize.width - marginX, yPos);
                         yPos += 20;
                         
-                        // Question text
                         const questionText = q.question_en || "";
                         doc.setFont("Helvetica", "bold");
                         doc.setFontSize(11);
@@ -1648,7 +1934,6 @@
                         doc.text(wrappedQuestion, marginX, yPos);
                         yPos += 12 * wrappedQuestion.length + 10;
                         
-                        // Options
                         doc.setFont("Helvetica", "normal");
                         doc.setFontSize(10);
                         const optionKeys = ["a", "b", "c", "d"];
@@ -1662,10 +1947,10 @@
                             let optionText = `${String.fromCharCode(65 + optIndex)}) ${optText}`;
                             
                             if (currentOptionKey === correctAnswer) {
-                                doc.setTextColor(40, 167, 69); // Green
+                                doc.setTextColor(40, 167, 69);
                                 optionText = (userAnswer === currentOptionKey ? "✓ " : "  ") + optionText;
                             } else if (currentOptionKey === userAnswer) {
-                                doc.setTextColor(220, 53, 69); // Red
+                                doc.setTextColor(220, 53, 69);
                                 optionText = `✗ ${optionText}`;
                             } else {
                                 doc.setTextColor(50, 50, 50);
@@ -1678,7 +1963,6 @@
                         
                         doc.setTextColor(0, 0, 0);
                         
-                        // Status and time
                         const timeValue = timeSpent[q.id] || 0;
                         const mins = Math.floor(timeValue / 60);
                         const secs = timeValue % 60;
@@ -1702,7 +1986,6 @@
                         
                         yPos += 20;
                         
-                        // Solution box
                         doc.setFillColor(240, 248, 255);
                         const solutionText = q.solution_en || "";
                         const wrappedSolution = doc.splitTextToSize(`Solution: ${solutionText}`, pageWidth - 20);
@@ -1713,19 +1996,19 @@
                         yPos += 12 * wrappedSolution.length + 15;
                     });
                     
-                    // Save PDF
-                    if (isAndroidApp) {
-                        saveInApp(doc);
-                    } else {
-                        doc.save(fileName);
+                    if (isAndroidApp) { 
+                        saveInApp(doc); 
+                    } else { 
+                        doc.save(fileName); 
                     }
                 }
                 
+                showToast('PDF downloaded successfully! 📄', 'success', 2000);
+                
             } catch (error) {
                 console.error("Error generating PDF:", error);
-                alert("Sorry, there was an error generating the PDF.");
+                showToast('PDF generation failed', 'error', 2000);
             } finally {
-                // Cleanup
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
                 if (overlay) {
