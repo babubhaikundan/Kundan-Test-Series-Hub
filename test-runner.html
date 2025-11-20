@@ -59,27 +59,27 @@
         @keyframes pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,.4)}70%{transform:scale(1.02);box-shadow:0 0 0 10px rgba(0,123,255,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,123,255,0)}}
         
         /* ==================== Toast Notification ==================== */
-        .toast-notification {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 50px;
-            z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast-notification i {
-            font-size: 1.1rem;
-        }
+.toast-notification {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: #fff;
+    padding: 6px 14px; /* Reduced padding for smaller appearance */
+    border-radius: 20px; /* Slightly smaller border radius */
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Smaller shadow */
+    animation: slideUp 0.3s ease;
+    font-size: 0.75rem; /* Smaller font size */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Smaller gap */
+}
+      .toast-notification i {
+    font-size: 0.85rem; /* Smaller icon */
+}
         .toast-notification.success {
             background: var(--success);
         }
@@ -373,8 +373,6 @@
                     <button id="fullscreen-btn" class="control-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen (F)"><i class="fas fa-expand"></i></button>
                     <!-- Theme Toggle Button -->
                     <button id="theme-toggle-btn" class="control-btn" onclick="toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-                    <!-- Keyboard Shortcuts Help Button -->
-                    <button id="shortcuts-btn" class="control-btn" onclick="toggleShortcutsHelp()" title="Keyboard Shortcuts (?)"><i class="fas fa-keyboard"></i></button>
                     <!-- Submit Button -->
                     <button id="submit-btn-header" class="submit-btn-header" onclick="confirmSubmit()">Submit</button>
                     <!-- Navigator Toggle (mobile only) -->
@@ -2018,4 +2016,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
